@@ -2268,8 +2268,14 @@ document.getElementById(
       ).style.display =
         "block";
 
+      const apiNotConfigured =
+        error && error.message ===
+        "HTTPS API endpoint is not configured";
+
       alert(
-        "命式の計算中にエラーが発生しました。入力内容をご確認ください。"
+        apiNotConfigured
+          ? "現在、鑑定システムの準備を進めております。しばらくしてからお試しください。"
+          : "命式の計算中にエラーが発生しました。入力内容をご確認ください。"
       );
     }
 
