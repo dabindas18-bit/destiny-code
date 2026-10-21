@@ -1,0 +1,758 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#070a16">
+
+<title>DESTINY CODE | 韓国式 四柱推命</title>
+
+<style>
+:root {
+  --bg:#070a16;
+  --bg2:#0c1122;
+  --card:#11182b;
+  --gold:#c9a85b;
+  --gold2:#ead596;
+  --text:#f4f1e8;
+  --muted:#9b9eaa;
+  --line:rgba(201,168,91,.22);
+}
+
+* {
+  box-sizing:border-box;
+}
+
+html {
+  scroll-behavior:smooth;
+}
+
+body {
+  margin:0;
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      #172143 0,
+      #090d1b 34%,
+      #050711 72%
+    );
+  color:var(--text);
+  font-family:
+    "Noto Serif JP",
+    "Yu Mincho",
+    "Hiragino Mincho ProN",
+    serif;
+}
+
+a {
+  color:inherit;
+  text-decoration:none;
+}
+
+.page {
+  width:min(100%,1080px);
+  margin:auto;
+}
+
+.topbar {
+  height:66px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-bottom:1px solid var(--line);
+}
+
+.brand {
+  font-family:Arial,sans-serif;
+  color:var(--gold2);
+  font-size:15px;
+  font-weight:600;
+  letter-spacing:.32em;
+}
+
+/* HERO */
+
+.hero {
+  min-height:700px;
+  display:grid;
+  grid-template-columns:1fr .95fr;
+  align-items:center;
+  padding:54px 48px 70px;
+  position:relative;
+  overflow:hidden;
+}
+
+.hero:after {
+  content:"";
+  position:absolute;
+  width:440px;
+  height:440px;
+  border:1px solid rgba(201,168,91,.08);
+  border-radius:50%;
+  right:-180px;
+  top:80px;
+}
+
+.hero-copy {
+  position:relative;
+  z-index:3;
+}
+
+.eyebrow,
+.section-kicker {
+  color:var(--gold);
+  font-family:Arial,sans-serif;
+  letter-spacing:.20em;
+  font-size:11px;
+}
+
+.eyebrow {
+  margin-bottom:22px;
+}
+
+.hero h1 {
+  margin:0;
+  font-size:clamp(34px,4.2vw,58px);
+  font-weight:500;
+  letter-spacing:.035em;
+  line-height:1.38;
+}
+
+.hero h1 span {
+  color:var(--gold2);
+}
+
+.lead {
+  color:#c7c7ca;
+  font-size:16px;
+  line-height:2;
+  margin:28px 0;
+}
+
+.tech {
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-bottom:30px;
+}
+
+.tech span {
+  border:1px solid var(--line);
+  color:#c7b77f;
+  border-radius:30px;
+  padding:7px 12px;
+  font-size:11px;
+  letter-spacing:.08em;
+}
+
+.primary {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:52px;
+  padding:0 26px;
+  background:
+    linear-gradient(
+      120deg,
+      #b48c3d,
+      #e2c879
+    );
+  color:#111;
+  font-family:Arial,sans-serif;
+  font-size:13px;
+  font-weight:700;
+  letter-spacing:.06em;
+  border-radius:3px;
+  transition:.2s ease;
+}
+
+.primary:hover {
+  transform:translateY(-2px);
+  box-shadow:0 9px 30px rgba(201,168,91,.16);
+}
+
+.hero-note {
+  margin-top:14px;
+  color:#777f91;
+  font-family:Arial,sans-serif;
+  font-size:11px;
+  letter-spacing:.06em;
+}
+
+.hero-image-wrap {
+  display:flex;
+  justify-content:center;
+  position:relative;
+  z-index:2;
+}
+
+.hero-image {
+  width:min(100%,390px);
+  aspect-ratio:3/4;
+  object-fit:cover;
+  object-position:center top;
+  border-radius:210px 210px 24px 24px;
+  filter:saturate(.9) contrast(1.05);
+  border:1px solid rgba(219,187,106,.26);
+  box-shadow:
+    0 30px 90px rgba(0,0,0,.55),
+    0 0 70px rgba(196,157,71,.08);
+}
+
+/* METHOD */
+
+.method {
+  border-top:1px solid var(--line);
+  border-bottom:1px solid var(--line);
+  padding:67px 28px;
+  text-align:center;
+}
+
+.method h2,
+.readings h2 {
+  margin:13px 0 18px;
+  font-size:30px;
+  font-weight:500;
+}
+
+.method > p {
+  max-width:680px;
+  margin:auto;
+  color:var(--muted);
+  line-height:2;
+  font-size:14px;
+}
+
+.method-flow {
+  margin:38px auto 0;
+  max-width:780px;
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+}
+
+.method-item {
+  padding:17px 10px;
+  border-right:1px solid var(--line);
+}
+
+.method-item:last-child {
+  border-right:none;
+}
+
+.method-no {
+  color:var(--gold);
+  font-family:Arial,sans-serif;
+  font-size:10px;
+  margin-bottom:8px;
+}
+
+.method-name {
+  font-size:15px;
+}
+
+.method-note {
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:14px;
+  margin:35px auto 0;
+  color:#858b9a;
+  font-size:11px;
+}
+
+.method-note i {
+  width:3px;
+  height:3px;
+  background:var(--gold);
+  border-radius:50%;
+}
+
+/* READINGS */
+
+.readings {
+  padding:80px 38px 90px;
+}
+
+.readings-head {
+  text-align:center;
+  margin-bottom:44px;
+}
+
+.readings-head p {
+  color:var(--muted);
+  font-size:13px;
+}
+
+.grid {
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:14px;
+  max-width:820px;
+  margin:auto;
+}
+
+.reading {
+  min-height:190px;
+  padding:28px;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(22,29,50,.95),
+      rgba(10,14,29,.95)
+    );
+  border:1px solid var(--line);
+  position:relative;
+  overflow:hidden;
+  transition:.25s ease;
+}
+
+.reading:hover {
+  transform:translateY(-3px);
+  border-color:rgba(225,193,113,.6);
+}
+
+.reading-no {
+  position:absolute;
+  right:22px;
+  top:19px;
+  color:rgba(226,202,142,.25);
+  font-family:Arial,sans-serif;
+  font-size:27px;
+}
+
+.reading small {
+  color:var(--gold);
+  font-family:Arial,sans-serif;
+  letter-spacing:.14em;
+  font-size:10px;
+}
+
+.reading h3 {
+  margin:13px 0 11px;
+  font-size:21px;
+  font-weight:500;
+}
+
+.reading p {
+  color:var(--muted);
+  line-height:1.8;
+  font-size:13px;
+  margin:0;
+}
+
+.arrow {
+  display:block;
+  margin-top:20px;
+  color:var(--gold2);
+  font-family:Arial,sans-serif;
+  font-size:12px;
+}
+
+/* FULL */
+
+.final {
+  margin:0 38px 80px;
+  padding:54px 28px;
+  border:1px solid var(--line);
+  text-align:center;
+  background:
+    radial-gradient(
+      circle at center,
+      #182044 0,
+      #0b0f20 67%
+    );
+}
+
+.final h2 {
+  font-size:28px;
+  font-weight:500;
+  margin:10px 0 17px;
+}
+
+.final p {
+  color:var(--muted);
+  line-height:1.9;
+  margin-bottom:27px;
+}
+
+/* NOTICE */
+
+.notice {
+  padding:0 30px 55px;
+  text-align:center;
+  color:#696d79;
+  font-family:Arial,sans-serif;
+  font-size:10px;
+  line-height:1.8;
+}
+
+/* MOBILE */
+
+@media(max-width:720px) {
+
+  .topbar {
+    height:58px;
+  }
+
+  .brand {
+    font-size:12px;
+  }
+
+  .hero {
+    min-height:auto;
+    grid-template-columns:1fr;
+    padding:42px 22px 60px;
+  }
+
+  .hero-copy {
+    text-align:center;
+  }
+
+  .hero h1 {
+    font-size:36px;
+    line-height:1.42;
+  }
+
+  .lead {
+    font-size:14px;
+  }
+
+  .hero .lead br {
+    display:none;
+  }
+
+  .tech {
+    justify-content:center;
+  }
+
+  .hero-image-wrap {
+    margin-top:40px;
+  }
+
+  .hero-image {
+    width:72%;
+    max-width:330px;
+  }
+
+  .method {
+    padding:58px 20px;
+  }
+
+  .method h2,
+  .readings h2 {
+    font-size:25px;
+    line-height:1.5;
+  }
+
+  .method-flow {
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .method-item:nth-child(2) {
+    border-right:none;
+  }
+
+  .method-item:nth-child(-n+2) {
+    border-bottom:1px solid var(--line);
+  }
+
+  .grid {
+    grid-template-columns:1fr;
+  }
+
+  .readings {
+    padding:65px 18px;
+  }
+
+  .final {
+    margin:0 18px 60px;
+  }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="page">
+
+<header class="topbar">
+  <div class="brand">
+    DESTINY CODE
+  </div>
+</header>
+
+<section class="hero">
+
+  <div class="hero-copy">
+
+    <div class="eyebrow">
+      KOREAN FOUR PILLARS READING
+    </div>
+
+    <h1>
+      生まれた瞬間に刻まれた、<br>
+      <span>あなただけの命式。</span>
+    </h1>
+
+    <p class="lead">
+      生年月日と出生時間から四柱を算出し、<br>
+      五行・通変星・大運・年運を読み解く<br>
+      韓国式の四柱推命リーディング。
+    </p>
+
+    <div class="tech">
+      <span>四柱</span>
+      <span>五行</span>
+      <span>通変星</span>
+      <span>大運</span>
+      <span>年運</span>
+    </div>
+
+    <a
+      class="primary"
+      href="#readings"
+    >
+      あなたの運勢を読み解く
+    </a>
+
+    <div class="hero-note">
+      生年月日から命式を算出 · 入力約1分
+    </div>
+
+  </div>
+
+  <div class="hero-image-wrap">
+
+    <img
+      class="hero-image"
+      src="images/hero-main.png"
+      alt="DESTINY CODE"
+    >
+
+  </div>
+
+</section>
+
+<section class="method">
+
+  <div class="section-kicker">
+    FOUR PILLARS
+  </div>
+
+  <h2>
+    四柱推命は、何を読むのか。
+  </h2>
+
+  <p>
+    年・月・日・時の四つの柱から命式を組み、
+    五行の配置や通変星、時間とともに変化する
+    大運・年運を重ねて人生の流れを読み解きます。
+  </p>
+
+  <div class="method-flow">
+
+    <div class="method-item">
+      <div class="method-no">01</div>
+      <div class="method-name">命式</div>
+    </div>
+
+    <div class="method-item">
+      <div class="method-no">02</div>
+      <div class="method-name">五行</div>
+    </div>
+
+    <div class="method-item">
+      <div class="method-no">03</div>
+      <div class="method-name">通変星</div>
+    </div>
+
+    <div class="method-item">
+      <div class="method-no">04</div>
+      <div class="method-name">大運・年運</div>
+    </div>
+
+  </div>
+
+  <div class="method-note">
+    <span>命式を個別算出</span>
+    <i></i>
+    <span>出生時間に対応</span>
+    <i></i>
+    <span>大運・年運を個別解析</span>
+  </div>
+
+</section>
+
+<section
+  class="readings"
+  id="readings"
+>
+
+  <div class="readings-head">
+
+    <div class="section-kicker">
+      PERSONAL READING
+    </div>
+
+    <h2>
+      今、知りたい運勢を選ぶ。
+    </h2>
+
+    <p>
+      すべての鑑定は、
+      あなた自身の命式から始まります。
+    </p>
+
+  </div>
+
+  <div class="grid">
+
+    <a
+      class="reading"
+      href="reading.html?category=love"
+    >
+      <span class="reading-no">01</span>
+      <small>LOVE & CONNECTION</small>
+      <h3>恋愛・ご縁</h3>
+      <small>¥980 · 無料プレビュー</small>
+      <p>
+        恋愛で現れやすい傾向や、
+        ご縁との向き合い方を読み解きます。
+      </p>
+      <span class="arrow">
+        鑑定する →
+      </span>
+    </a>
+
+    <a
+      class="reading"
+      href="reading.html?category=career"
+    >
+      <span class="reading-no">02</span>
+      <small>WORK & CAREER</small>
+      <h3>仕事・転職</h3>
+      <small>¥980 · 近日公開</small>
+      <p>
+        仕事で生かしやすい性質と、
+        キャリアの流れを読み解きます。
+      </p>
+      <span class="arrow">
+        近日公開 →
+      </span>
+    </a>
+
+    <a
+      class="reading"
+      href="reading.html?category=money"
+    >
+      <span class="reading-no">03</span>
+      <small>MONEY & VALUE</small>
+      <h3>金運・財運</h3>
+      <small>¥980 · 近日公開</small>
+      <p>
+        お金との付き合い方や、
+        財を扱うパターンを読み解きます。
+      </p>
+      <span class="arrow">
+        近日公開 →
+      </span>
+    </a>
+
+    <a
+      class="reading"
+      href="reading.html?category=business"
+    >
+      <span class="reading-no">04</span>
+      <small>BUSINESS</small>
+      <h3>事業・独立</h3>
+      <small>¥980 · 近日公開</small>
+      <p>
+        独立や事業に向き合うときの、
+        自分らしい力の使い方を読みます。
+      </p>
+      <span class="arrow">
+        近日公開 →
+      </span>
+    </a>
+
+    <a
+      class="reading"
+      href="reading.html?category=year2027"
+    >
+      <span class="reading-no">05</span>
+      <small>NEW YEAR FORTUNE</small>
+      <h3>新年運勢</h3>
+      <small>¥1,980 · 近日公開</small>
+      <p>
+        年運と命式を重ね、
+        新しい一年のテーマと流れを読み解きます。
+      </p>
+      <span class="arrow">
+        近日公開 →
+      </span>
+    </a>
+
+    <a
+      class="reading"
+      href="reading.html?category=full"
+    >
+      <span class="reading-no">06</span>
+      <small>LIFE CYCLE</small>
+      <h3>人生総合鑑定</h3>
+      <small>¥4,980 · 近日公開</small>
+      <p>
+        10年単位で巡る大運から、
+        人生の大きな季節を見ていきます。
+      </p>
+      <span class="arrow">
+        近日公開 →
+      </span>
+    </a>
+
+  </div>
+
+</section>
+
+<section class="final">
+
+  <div class="section-kicker">
+    COMPLETE READING
+  </div>
+
+  <h2>
+    一つではなく、
+    人生全体を読みたい方へ。
+  </h2>
+
+  <p>
+    命式・五行・通変星・大運・年運をまとめた<br>
+    DESTINY CODE フルリーディング。
+  </p>
+
+  <a
+    class="primary"
+    href="reading.html?category=full"
+  >
+    人生総合鑑定 ¥4,980 · 近日公開
+  </a>
+
+</section>
+
+<div class="notice">
+
+  本サービスは伝統的な命理学をもとにした
+  エンターテインメント・自己理解のための
+  コンテンツです。
+  <br>
+  医療・法律・投資その他の専門的判断を
+  代替するものではありません。
+
+</div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,2566 @@
+<!doctype html>
+<html lang="ja">
+
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#070a16">
+
+<title>DESTINY CODE</title>
+
+<style>
+:root{
+  --bg:#060914;
+  --panel:#0f1629;
+  --gold:#c9a85b;
+  --gold2:#ead596;
+  --text:#f5f1e8;
+  --muted:#979dac;
+  --line:rgba(201,168,91,.23);
+  --input:#090e1d;
+}
+
+*{
+  box-sizing:border-box;
+}
+
+html{
+  scroll-behavior:smooth;
+}
+
+body{
+  margin:0;
+  min-height:100vh;
+  background:
+    radial-gradient(circle at 50% 0%,#17213d 0,#090d1a 30%,#050711 70%);
+  color:var(--text);
+  font-family:
+    "Noto Serif JP",
+    "Yu Mincho",
+    "Hiragino Mincho ProN",
+    serif;
+}
+
+button,
+input,
+select{
+  font:inherit;
+}
+
+a{
+  color:inherit;
+  text-decoration:none;
+}
+
+.shell{
+  width:min(100%,720px);
+  margin:auto;
+}
+
+/* HEADER */
+
+header{
+  height:58px;
+  padding:0 18px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  border-bottom:1px solid var(--line);
+}
+
+.logo{
+  color:var(--gold2);
+  font-family:Arial,sans-serif;
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:.25em;
+}
+
+.back{
+  color:#767e8d;
+  font-family:Arial,sans-serif;
+  font-size:10px;
+}
+
+/* INPUT */
+
+.entry{
+  padding:35px 18px 65px;
+}
+
+.intro{
+  text-align:center;
+  margin-bottom:29px;
+}
+
+.kicker{
+  color:var(--gold);
+  font-family:Arial,sans-serif;
+  font-size:10px;
+  letter-spacing:.19em;
+}
+
+.intro h1{
+  margin:10px 0 12px;
+  font-size:31px;
+  font-weight:500;
+}
+
+.intro p{
+  margin:0 auto;
+  max-width:470px;
+  color:var(--muted);
+  line-height:1.8;
+  font-size:12px;
+}
+
+.quick{
+  margin:19px auto 0;
+  display:inline-flex;
+  gap:8px;
+  align-items:center;
+  color:#777f8f;
+  font-family:Arial,sans-serif;
+  font-size:10px;
+}
+
+.quick i{
+  width:3px;
+  height:3px;
+  border-radius:50%;
+  background:var(--gold);
+}
+
+.form-card{
+  padding:27px 20px;
+  background:
+    linear-gradient(145deg,rgba(17,25,46,.98),rgba(8,13,26,.98));
+  border:1px solid var(--line);
+}
+
+.group{
+  margin-bottom:24px;
+}
+
+label.field-title{
+  display:block;
+  margin-bottom:9px;
+  font-size:12px;
+  color:#ddd9cf;
+}
+
+.req{
+  color:var(--gold);
+  margin-left:3px;
+}
+
+.birth{
+  display:grid;
+  grid-template-columns:1.35fr 1fr 1fr;
+  gap:7px;
+}
+
+.time{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:7px;
+}
+
+input,
+select{
+  width:100%;
+  height:50px;
+  border:1px solid rgba(201,168,91,.24);
+  background:var(--input);
+  color:white;
+  border-radius:3px;
+  padding:0 11px;
+  outline:none;
+  font-size:13px;
+}
+
+input:focus,
+select:focus{
+  border-color:var(--gold);
+}
+
+input::placeholder{
+  color:#515a6c;
+}
+
+.gender{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+
+.gender input{
+  display:none;
+}
+
+.gender label{
+  height:48px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  border:1px solid rgba(201,168,91,.24);
+  background:var(--input);
+  color:#a3a8b3;
+  cursor:pointer;
+  font-size:12px;
+}
+
+.gender input:checked + label{
+  border-color:var(--gold);
+  color:var(--gold2);
+  background:#17192a;
+}
+
+.unknown{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-top:12px;
+  color:#969cab;
+  font-size:11px;
+  cursor:pointer;
+}
+
+.unknown input{
+  width:16px;
+  height:16px;
+  accent-color:var(--gold);
+}
+
+.help{
+  margin-top:7px;
+  color:#626a7b;
+  font-size:9px;
+  line-height:1.6;
+}
+
+.cta{
+  width:100%;
+  min-height:56px;
+  border:0;
+  border-radius:3px;
+  color:#111;
+  background:linear-gradient(120deg,#b78d3c,#e5cc7b);
+  font-size:13px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.cta:disabled{
+  opacity:0.45;
+  cursor:not-allowed;
+}
+
+.privacy{
+  margin-top:13px;
+  text-align:center;
+  color:#626a79;
+  font-family:Arial,sans-serif;
+  font-size:9px;
+}
+
+/* ANALYSIS */
+
+.analysis{
+  display:none;
+  min-height:calc(100vh - 58px);
+  padding:35px 18px 55px;
+  text-align:center;
+  overflow:hidden;
+  position:relative;
+}
+
+.analysis.active{
+  display:block;
+}
+
+.analysis:before{
+  content:"";
+  position:absolute;
+  width:280px;
+  height:280px;
+  left:50%;
+  top:90px;
+  transform:translateX(-50%);
+  border-radius:50%;
+  background:rgba(201,168,91,.08);
+  filter:blur(55px);
+  animation:pulse 2.2s infinite alternate;
+}
+
+@keyframes pulse{
+  from{opacity:.25;transform:translateX(-50%) scale(.9)}
+  to{opacity:.75;transform:translateX(-50%) scale(1.1)}
+}
+
+.analysis-image{
+  width:76%;
+  max-width:340px;
+  aspect-ratio:3/4;
+  object-fit:cover;
+  object-position:center top;
+  border-radius:180px 180px 16px 16px;
+  position:relative;
+  z-index:2;
+  border:1px solid rgba(201,168,91,.23);
+  box-shadow:0 25px 80px rgba(0,0,0,.55);
+}
+
+.analysis h2{
+  position:relative;
+  z-index:2;
+  font-size:24px;
+  font-weight:500;
+  line-height:1.6;
+  margin:25px 0 6px;
+}
+
+.analysis-sub{
+  position:relative;
+  z-index:2;
+  color:var(--gold);
+  font-family:Arial,sans-serif;
+  font-size:10px;
+  letter-spacing:.14em;
+}
+
+.steps{
+  width:min(100%,430px);
+  margin:29px auto 0;
+  text-align:left;
+  position:relative;
+  z-index:2;
+}
+
+.step{
+  min-height:45px;
+  border-bottom:1px solid rgba(201,168,91,.14);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  color:#777f8e;
+  font-size:11px;
+  transition:.3s;
+}
+
+.step.active{
+  color:#e9e5dc;
+}
+
+.step.done{
+  color:#bda35e;
+}
+
+.state{
+  font-family:Arial,sans-serif;
+  color:var(--gold);
+}
+
+/* RESULT */
+
+.result{
+  display:none;
+  padding:32px 18px 75px;
+}
+
+.result.active{
+  display:block;
+}
+
+.result-head{
+  text-align:center;
+  padding-bottom:30px;
+}
+
+.result-head .complete{
+  color:var(--gold);
+  font-family:Arial,sans-serif;
+  letter-spacing:.18em;
+  font-size:10px;
+}
+
+.result-head h2{
+  margin:10px 0 10px;
+  font-size:26px;
+  font-weight:500;
+}
+
+.result-head p{
+  margin:0;
+  color:var(--muted);
+  font-size:11px;
+  line-height:1.8;
+}
+
+.theme-image{
+  width:100%;
+  max-height:430px;
+  object-fit:cover;
+  object-position:center 25%;
+  border:1px solid var(--line);
+  display:block;
+}
+
+.fact-title{
+  text-align:center;
+  margin:38px 0 20px;
+}
+
+.fact-title small{
+  color:var(--gold);
+  font-family:Arial,sans-serif;
+  letter-spacing:.15em;
+  font-size:9px;
+}
+
+.fact-title h3{
+  margin:9px 0 0;
+  font-size:20px;
+  font-weight:500;
+}
+
+.facts{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  border-top:1px solid var(--line);
+  border-bottom:1px solid var(--line);
+}
+
+.fact{
+  padding:20px 5px;
+  text-align:center;
+  border-right:1px solid var(--line);
+}
+
+.fact:last-child{
+  border-right:0;
+}
+
+.fact small{
+  display:block;
+  color:#676f7d;
+  font-size:9px;
+  margin-bottom:8px;
+}
+
+.fact strong{
+  color:#b0b5bf;
+  font-size:12px;
+  font-weight:400;
+}
+
+.engine-wait{
+  margin:18px 0 0;
+  color:#646c7b;
+  text-align:center;
+  font-family:Arial,sans-serif;
+  font-size:9px;
+}
+
+.preview{
+  margin:45px 0;
+  padding:28px 22px;
+  background:#0d1426;
+  border-left:2px solid var(--gold);
+}
+
+.preview small{
+  color:var(--gold);
+  font-family:Arial,sans-serif;
+  letter-spacing:.16em;
+  font-size:9px;
+}
+
+.preview h3{
+  margin:12px 0;
+  font-size:20px;
+  font-weight:500;
+}
+
+.preview p{
+  color:#9198a6;
+  font-size:12px;
+  line-height:2;
+  margin:0;
+}
+
+.dev-label{
+  display:inline-block;
+  margin-top:17px;
+  padding:5px 8px;
+  border:1px solid #403d33;
+  color:#82765c;
+  font-family:Arial,sans-serif;
+  font-size:8px;
+}
+
+/* PAYWALL */
+
+.paywall{
+  padding-top:10px;
+}
+
+.payment-image{
+  width:100%;
+  max-height:460px;
+  object-fit:cover;
+  object-position:center 22%;
+  display:block;
+  border:1px solid var(--line);
+}
+
+.pay-copy{
+  text-align:center;
+  padding:31px 15px 20px;
+}
+
+.pay-copy small{
+  color:var(--gold);
+  letter-spacing:.15em;
+  font-family:Arial,sans-serif;
+  font-size:9px;
+}
+
+.pay-copy h3{
+  margin:12px 0 15px;
+  font-size:24px;
+  font-weight:500;
+  line-height:1.55;
+}
+
+.pay-copy p{
+  color:#8d94a1;
+  font-size:11px;
+  line-height:1.9;
+}
+
+.lock-list{
+  margin:15px auto 25px;
+  max-width:470px;
+  border-top:1px solid var(--line);
+}
+
+.lock-item{
+  display:flex;
+  gap:12px;
+  padding:14px 5px;
+  border-bottom:1px solid var(--line);
+  color:#a2a7b1;
+  font-size:11px;
+}
+
+.lock{
+  color:var(--gold);
+}
+
+.pay-button{
+  width:100%;
+  min-height:58px;
+  border:0;
+  border-radius:3px;
+  background:linear-gradient(120deg,#b58c3c,#e6cc7a);
+  color:#111;
+  font-size:13px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.payment-note{
+  margin-top:12px;
+  text-align:center;
+  color:#606777;
+  font-size:9px;
+}
+
+/* DESKTOP */
+
+@media(min-width:760px){
+
+  .shell{
+    width:min(100%,760px);
+  }
+
+  .entry{
+    padding-top:55px;
+  }
+
+  .form-card{
+    padding:38px 44px;
+  }
+
+  .intro h1{
+    font-size:36px;
+  }
+}
+
+
+/* STORY PAYWALL V1 */
+
+.story-open-loop {
+  position:relative;
+  height:310px;
+  margin-top:30px;
+  overflow:hidden;
+}
+
+.story-open-loop p {
+  margin:0;
+  color:rgba(255,255,255,.88);
+  font-size:14px;
+  line-height:2.15;
+}
+
+.story-open-loop::after {
+  content:"";
+  position:absolute;
+  z-index:2;
+  left:0;
+  right:0;
+  bottom:0;
+  height:235px;
+  pointer-events:none;
+  background:linear-gradient(
+    to bottom,
+    rgba(14,22,42,0) 0%,
+    rgba(14,22,42,.06) 12%,
+    rgba(14,22,42,.20) 28%,
+    rgba(14,22,42,.47) 48%,
+    rgba(14,22,42,.75) 68%,
+    rgba(14,22,42,.93) 84%,
+    #0e162a 100%
+  );
+}
+
+.story-lock {
+  text-align:center;
+  color:#c9a85b;
+  font-size:19px;
+  margin-top:7px;
+}
+
+.payment-emotion {
+  margin:36px auto 28px;
+  text-align:center;
+}
+
+.payment-emotion .emotion {
+  margin:0;
+  color:#fff;
+  font-size:clamp(23px,5vw,34px);
+  font-weight:500;
+  line-height:1.55;
+}
+
+.payment-emotion .value {
+  max-width:550px;
+  margin:18px auto 0;
+  color:#abb2c0;
+  font-size:13px;
+  line-height:2;
+}
+
+.payment-product {
+  margin:30px auto 25px;
+  text-align:center;
+}
+
+.payment-product .name {
+  color:#c9a85b;
+  font-family:Arial,sans-serif;
+  font-size:10px;
+  letter-spacing:.17em;
+}
+
+.payment-product .price {
+  margin-top:10px;
+  color:#fff;
+  font-family:Arial,sans-serif;
+  font-size:31px;
+}
+
+.payment-product .tax {
+  margin-left:5px;
+  color:#757d8e;
+  font-size:10px;
+}
+
+.after-payment-intro {
+  margin-bottom:32px;
+  padding-bottom:28px;
+  border-bottom:
+    1px solid rgba(201,168,91,.18);
+}
+
+.after-payment-intro .emotion {
+  margin:0 0 13px;
+  color:#c9a85b;
+  font-size:22px;
+  line-height:1.6;
+}
+
+.after-payment-intro .continue {
+  margin:0;
+  color:#abb2c0;
+  font-size:13px;
+  line-height:2;
+}
+
+
+/* LOVE RESULT CARDS V1 */
+
+.reading-chapters{
+  margin-top:34px;
+}
+
+.reading-chapter{
+  position:relative;
+  padding:38px 4px 42px;
+  border-top:
+    1px solid rgba(201,168,91,.18);
+}
+
+.reading-chapter:first-child{
+  border-top:0;
+  padding-top:8px;
+}
+
+.chapter-number{
+  color:#c9a85b;
+  font-family:Arial,sans-serif;
+  font-size:10px;
+  letter-spacing:.20em;
+  margin-bottom:12px;
+}
+
+.chapter-title{
+  margin:0 0 22px;
+  color:#fff;
+  font-size:21px;
+  font-weight:500;
+  line-height:1.65;
+}
+
+.chapter-body{
+  margin:0;
+  color:rgba(255,255,255,.84);
+  font-size:14px;
+  line-height:2.15;
+  white-space:pre-wrap;
+}
+
+.reading-chapter.destiny-letter{
+  margin-top:20px;
+  padding:40px 24px;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(201,168,91,.08),
+      rgba(14,22,42,.6)
+    );
+  border:
+    1px solid rgba(201,168,91,.18);
+}
+
+.reading-chapter.destiny-letter
+.chapter-title{
+  color:#c9a85b;
+  letter-spacing:.06em;
+}
+
+.result-end{
+  margin-top:42px;
+  padding-top:32px;
+  border-top:
+    1px solid rgba(201,168,91,.18);
+  text-align:center;
+}
+
+.result-end .small{
+  color:#777f8f;
+  font-size:10px;
+  letter-spacing:.10em;
+}
+
+.result-end .message{
+  margin-top:12px;
+  color:#c9a85b;
+  font-size:16px;
+  line-height:1.8;
+}
+
+</style>
+
+<script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
+
+<style id="birthPlaceSimpleStyle">
+.birth-place-options{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.birth-place-option{display:flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:10px 12px;border:1px solid rgba(255,255,255,.14);border-radius:12px;background:rgba(255,255,255,.04);color:#f5efe4;font-size:14px;cursor:pointer;box-sizing:border-box;}
+.birth-place-option input{accent-color:#b69b63;}
+</style>
+
+</head>
+
+<body>
+
+<div class="shell">
+
+<header>
+  <a class="logo" href="index.html">
+    DESTINY CODE
+  </a>
+
+  <a class="back" href="index.html#readings">
+    ← MENU
+  </a>
+</header>
+
+<!-- INPUT -->
+
+<main class="entry" id="entry">
+
+  <div class="intro">
+
+    <div class="kicker" id="kicker">
+      LOVE & CONNECTION
+    </div>
+
+    <h1 id="title">
+      恋愛・ご縁
+    </h1>
+
+    <p id="introText">
+      生年月日から、あなた自身の命式を組み立てます。
+    </p>
+
+    <div class="quick">
+      <span>入力約1分</span>
+      <i></i>
+      <span>無料プレビュー</span>
+    </div>
+
+  </div>
+
+  <form class="form-card" id="birthForm">
+
+    <div class="group">
+      <label class="field-title" for="customerName">
+        お名前・ニックネーム（任意）
+      </label>
+
+      <input
+        id="customerName"
+        name="customer_name"
+        type="text"
+        maxlength="20"
+        autocomplete="nickname"
+        placeholder="例：さくら"
+      >
+
+      <div class="help">
+        レポートに表示する名前です。本名でなくてもかまいません。
+      </div>
+
+    </div>
+
+    <div class="group">
+
+      <label class="field-title">
+        生年月日
+        <span class="req">*</span>
+      </label>
+
+      <div class="birth">
+
+        <input
+          id="year"
+          type="number"
+          min="1900"
+          max="2100"
+          inputmode="numeric"
+          placeholder="1990"
+          required
+        >
+
+        <select id="month" required>
+          <option value="">月</option>
+        </select>
+
+        <select id="day" required>
+          <option value="">日</option>
+        </select>
+
+      </div>
+
+      <div class="help">
+        西暦で入力してください。
+      </div>
+
+    </div>
+
+    <div class="group">
+
+      <label class="field-title">
+        性別
+        <span class="req">*</span>
+      </label>
+
+      <div class="gender">
+
+        <div>
+          <input
+            type="radio"
+            id="female"
+            name="gender"
+            value="female"
+            required
+          >
+          <label for="female">
+            女性
+          </label>
+        </div>
+
+        <div>
+          <input
+            type="radio"
+            id="male"
+            name="gender"
+            value="male"
+            required
+          >
+          <label for="male">
+            男性
+          </label>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="group">
+
+      <label class="field-title">
+        出生時間
+      </label>
+
+      <div class="time">
+
+        <select id="hour">
+          <option value="">時</option>
+        </select>
+
+        <select id="minute">
+          <option value="">分</option>
+        </select>
+
+      </div>
+
+      <label class="unknown">
+
+        <input
+          id="unknownTime"
+          type="checkbox"
+        >
+
+        出生時間がわからない
+
+      </label>
+
+      <div class="help">
+        不明の場合、時柱を使う分析には制限があります。
+      </div>
+
+    </div>
+
+        <div class="group">
+
+      <label class="field-title">
+        出生地
+        <span class="req">*</span>
+      </label>
+
+      <div class="birth-place-options">
+
+        <label class="birth-place-option">
+          <input
+            type="radio"
+            name="birthPlaceGroup"
+            value="日本"
+            checked
+          >
+          <span>日本国内</span>
+        </label>
+
+        <label class="birth-place-option">
+          <input
+            type="radio"
+            name="birthPlaceGroup"
+            value="韓国"
+          >
+          <span>韓国</span>
+        </label>
+
+      </div>
+
+      <input
+        id="birthPlace"
+        type="hidden"
+        value="日本"
+      >
+
+      <div class="help">
+        日本国内は日本時間、韓国は韓国時間で計算します。
+      </div>
+
+      <div class="help">
+        その他の国・地域は現在準備中です。
+      </div>
+
+    </div>
+
+    <button class="cta" id="submitButton" type="submit">
+      無料で恋愛運を読み解く
+    </button>
+
+    <div class="privacy">
+      入力情報は命式の算出・鑑定結果の生成に使用します。
+    </div>
+
+  </form>
+
+</main>
+
+<!-- ANALYSIS -->
+
+<section class="analysis" id="analysis">
+
+  <img
+    class="analysis-image"
+    src="images/ui/analysis.png"
+    alt=""
+  >
+
+  <div class="analysis-sub">
+    DESTINY ANALYSIS
+  </div>
+
+  <h2>
+    あなたの命式を<br>
+    読み解いています…
+  </h2>
+
+  <div class="steps">
+
+    <div class="step" id="step1">
+      <span>四柱を算出しています</span>
+      <span class="state" id="state1">···</span>
+    </div>
+
+    <div class="step" id="step2">
+      <span>五行を確認しています</span>
+      <span class="state" id="state2">···</span>
+    </div>
+
+    <div class="step" id="step3">
+      <span>通変星を整理しています</span>
+      <span class="state" id="state3">···</span>
+    </div>
+
+    <div class="step" id="step4">
+      <span id="categoryAnalysis">
+        恋愛に関する要素を確認しています
+      </span>
+      <span class="state" id="state4">···</span>
+    </div>
+
+  </div>
+
+</section>
+
+<!-- RESULT -->
+
+<section class="result" id="result">
+
+  <div class="result-head">
+
+    <div class="complete">
+      READING COMPLETE
+    </div>
+
+    <h2 id="resultTitle">
+      恋愛運を読み解きました。
+    </h2>
+
+    <p>
+      あなたの出生情報をもとに、
+      個別の命式を確認します。
+    </p>
+
+  </div>
+
+  <img
+    class="theme-image"
+    id="themeImage"
+    src="images/theme/love.png"
+    alt=""
+  >
+
+  <div class="fact-title">
+
+    <small>
+      YOUR FOUR PILLARS
+    </small>
+
+    <h3>
+      あなたの命式
+    </h3>
+
+  </div>
+
+  <div class="facts">
+
+    <div class="fact">
+      <small>日主</small>
+      <strong id="dayMaster">
+        --
+      </strong>
+    </div>
+
+    <div class="fact">
+      <small>五行</small>
+      <strong id="fiveElements">
+        --
+      </strong>
+    </div>
+
+    <div class="fact">
+      <small>大運</small>
+      <strong id="majorLuck">
+        --
+      </strong>
+    </div>
+
+  </div>
+
+  <div class="engine-wait">
+    
+  </div>
+
+  <article class="preview">
+
+    <small>
+      PERSONAL READING
+    </small>
+
+    <h3 id="previewHeading">
+      あなた自身の読み解き
+    </h3>
+
+    <div id="previewBody">
+
+      <p
+        id="hookLine1"
+        style="
+          font-size:16px;
+          color:#c9a85b;
+          margin-bottom:16px;
+        "
+      ></p>
+
+      <p
+        id="hookLine2"
+        style="
+          font-size:14px;
+          line-height:2;
+          margin-bottom:12px;
+          color:rgba(255,255,255,.85);
+        "
+      ></p>
+
+      <p
+        id="hookLine3"
+        style="
+          font-size:14px;
+          line-height:2;
+          margin-bottom:12px;
+          color:rgba(255,255,255,.85);
+        "
+      ></p>
+
+      <p
+        id="hookLine4"
+        style="
+          color:rgba(201,168,91,.65);
+          font-size:11px;
+          margin-top:20px;
+        "
+      ></p>
+
+      <div class="story-open-loop">
+
+        <p>
+          そして、ここでもうひとつ。<br><br>
+
+          関係が深くなったときほど、
+          確認しておきたいポイントがあります。
+          <br><br>
+
+          表面に見えている命式だけではなく、
+          いくつかの要素を重ねて見ることで、
+          恋愛の中で注目したい流れが
+          もう少し具体的に見えてきます。
+          <br><br>
+
+          特に確認したいのは、
+          関係の距離が変わったときに
+          この流れがどう現れるかということ。
+          <br><br>
+
+          そして、そのとき最も
+          見落としやすいポイントは――
+        </p>
+
+      </div>
+
+      <div class="story-lock">
+        &#128274;
+      </div>
+
+    </div>
+
+  </article>
+
+  <section class="paywall">
+
+    
+
+    <div class="pay-copy">
+
+      <small>
+        COMPLETE READING
+      </small>
+
+      <div class="payment-emotion">
+
+        <p class="emotion">
+          「あ…もっと早く知りたかった。」
+        </p>
+
+        <p class="value">
+          恋愛で繰り返しやすいパターンと、
+          すれ違いが生まれやすいポイント。<br>
+          あなたの命式から、
+          その続きを個別に読み解きます。
+        </p>
+
+      </div>
+
+    </div>
+
+    <div class="lock-list" id="lockList">
+    </div>
+
+    <button
+      class="pay-button"
+      id="payButton"
+      type="button"
+    >
+      私の恋愛の続きを読む
+    </button>
+
+    <div
+      id="visiblePrice"
+      style="
+        margin-top:14px;
+        text-align:center;
+        color:#a8afbd;
+        font-size:11px;
+        letter-spacing:.04em;
+      "
+    >
+      完全版 ¥980（税込）
+    </div>
+
+    <div class="payment-note">
+      現在はDEV決済テストモードです
+    </div>
+
+  </section>
+
+  <section
+    id="fullReadingResult"
+    style="
+      display:none;
+      margin-top:52px;
+      padding:34px 24px;
+      background:#0e162a;
+      border-left:2px solid #c9a85b;
+    "
+  >
+    <div
+      style="
+        color:#c9a85b;
+        font-size:10px;
+        letter-spacing:.16em;
+        margin-bottom:16px;
+      "
+    >
+      COMPLETE READING
+    </div>
+
+    <h2
+      style="
+        font-weight:500;
+        margin:0 0 24px;
+      "
+    >
+      あなたの個別リーディング
+    </h2>
+
+    <div
+      id="fullReadingBody"
+      style="
+        white-space:pre-wrap;
+        font-size:14px;
+        line-height:2.15;
+        color:rgba(255,255,255,.88);
+      "
+    ></div>
+
+    <div
+      style="
+        margin-top:30px;
+        color:#6f7788;
+        font-size:10px;
+        line-height:1.8;
+      "
+    >
+      この結果は伝統的な命理データをもとにした
+      AI生成リーディングです。
+      医療・法律・投資などの専門的判断を
+      代替するものではありません。
+    </div>
+  </section>
+
+</section>
+
+</div>
+
+<script>
+
+/* CATEGORY CONFIG */
+
+const CONFIG = {
+
+  love:{
+    kicker:"LOVE & CONNECTION",
+    title:"恋愛・ご縁",
+    intro:"生年月日から、あなたの恋愛に関わる命式の要素を読み解きます。",
+    button:"無料で恋愛運を読み解く",
+    analysis:"恋愛に関する要素を確認しています",
+    result:"恋愛運を読み解きました。",
+    image:"images/theme/love.png",
+    locks:[
+      "恋愛で現れやすいパターン",
+      "関係の中で生まれやすいズレ",
+      "現在の大運と恋愛の流れ",
+      "今年の恋愛テーマ"
+    ]
+  },
+
+  work:{
+    kicker:"WORK & CAREER",
+    title:"仕事・転職",
+    intro:"生年月日から、仕事やキャリアに関わる命式の要素を読み解きます。",
+    button:"無料で仕事運を読み解く",
+    analysis:"仕事に関する要素を確認しています",
+    result:"仕事運を読み解きました。",
+    image:"images/theme/work.png",
+    locks:[
+      "仕事で生かしやすい性質",
+      "働き方のパターン",
+      "現在の大運と仕事の流れ",
+      "今年のキャリアテーマ"
+    ]
+  },
+
+  money:{
+    kicker:"MONEY & VALUE",
+    title:"金運",
+    intro:"生年月日から、お金や価値との向き合い方に関わる要素を読み解きます。",
+    button:"無料で金運を読み解く",
+    analysis:"金運に関する要素を確認しています",
+    result:"金運を読み解きました。",
+    image:"images/theme/money.png",
+    locks:[
+      "お金との向き合い方",
+      "財を扱うときの傾向",
+      "現在の大運と金運の流れ",
+      "今年のお金のテーマ"
+    ]
+  },
+
+  business:{
+    kicker:"BUSINESS",
+    title:"事業・独立",
+    intro:"生年月日から、事業や独立に関わる命式の要素を読み解きます。",
+    button:"無料で事業運を読み解く",
+    analysis:"事業に関する要素を確認しています",
+    result:"事業運を読み解きました。",
+    image:"images/theme/business.png",
+    locks:[
+      "事業で使いやすい自分の力",
+      "独立時に現れやすい傾向",
+      "現在の大運と事業の流れ",
+      "今年の事業テーマ"
+    ]
+  },
+
+  year:{
+    kicker:"NEW YEAR FORTUNE",
+    title:"新年運勢",
+    intro:"あなたの命式と年運を重ね、今年の流れを読み解きます。",
+    button:"近日公開",
+    analysis:"今年の年運を確認しています",
+    result:"新年運勢",
+    image:"images/theme/life-cycle.png",
+    locks:[
+      "今年の大きなテーマ",
+      "変化が現れやすいポイント",
+      "仕事・関係・金運の流れ",
+      "今年を過ごすための総合リーディング"
+    ]
+  },
+
+  life:{
+    kicker:"LIFE CYCLE",
+    title:"人生・大運",
+    intro:"生年月日から大運を算出し、人生の長期的な流れを読み解きます。",
+    button:"無料で人生の流れを読み解く",
+    analysis:"大運の流れを確認しています",
+    result:"人生の流れを読み解きました。",
+    image:"images/theme/life-cycle.png",
+    locks:[
+      "人生を巡る大運",
+      "10年単位の大きなテーマ",
+      "現在いる人生の季節",
+      "これからの流れ"
+    ]
+  },
+
+  full:{
+    kicker:"COMPLETE READING",
+    title:"人生総合鑑定",
+    intro:"命式・五行・通変星・大運・年運をまとめて読み解きます。",
+    button:"無料で命式を確認する",
+    analysis:"命式全体を確認しています",
+    result:"あなたの命式を確認しました。",
+    image:"images/hero-main.png",
+    locks:[
+      "性質と内面のパターン",
+      "恋愛・仕事・金運",
+      "大運と今年の流れ",
+      "DESTINY CODE 総合リーディング"
+    ]
+  }
+
+};
+
+/* DESTINY CODE RUNTIME CONFIG */
+
+const DESTINY_LOCAL =
+  location.hostname === "localhost" ||
+  location.hostname === "127.0.0.1";
+
+const DESTINY = {
+  apiBase:
+    window.DESTINY_API_BASE ||
+    (DESTINY_LOCAL ? "http://127.0.0.1:8770" : "")
+};
+
+function destinyRequireApi() {
+  if (!DESTINY.apiBase) {
+    throw new Error(
+      "HTTPS API endpoint is not configured"
+    );
+  }
+
+  if (
+    !DESTINY_LOCAL &&
+    !DESTINY.apiBase.startsWith("https://")
+  ) {
+    throw new Error(
+      "Public site requires HTTPS API"
+    );
+  }
+
+  return DESTINY.apiBase.replace(/\/$/, "");
+}
+
+
+/* PRODUCT CODE NORMALIZATION */
+
+const PRODUCT_ALIAS = {
+  love:"love",
+  money:"money",
+  business:"business",
+  career:"career",
+  work:"career",
+  year2027:"year2027",
+  year:"year2027",
+  full:"full",
+  life:"full"
+};
+
+const LAYOUT_BY_PRODUCT = {
+  love:"love",
+  money:"money",
+  business:"business",
+  career:"work",
+  year2027:"year",
+  full:"full"
+};
+
+const SALEABLE_PRODUCTS = {
+  love:true
+};
+
+const PRODUCT_PRICES = {
+  love:980,
+  money:980,
+  business:980,
+  career:980,
+  year2027:1980,
+  full:4980
+};
+
+const params =
+  new URLSearchParams(
+    location.search
+  );
+
+const requested =
+  (params.get("category")
+    || params.get("type")
+    || "love")
+    .trim()
+    .toLowerCase();
+
+const PRODUCT_CODE =
+  PRODUCT_ALIAS[requested] || "love";
+
+const PRODUCT_SALEABLE =
+  SALEABLE_PRODUCTS[PRODUCT_CODE] === true;
+
+let type =
+  LAYOUT_BY_PRODUCT[PRODUCT_CODE] || "love";
+
+if(!CONFIG[type]){
+  type="love";
+}
+
+const C =
+  CONFIG[type];
+
+
+/* CATEGORY APPLY */
+
+/*
+ * Product availability and displayed price.
+ * Server-side product validation remains authoritative.
+ */
+const payButton =
+  document.getElementById("payButton");
+
+const visiblePrice =
+  document.getElementById("visiblePrice");
+
+if (visiblePrice) {
+  const price =
+    PRODUCT_PRICES[PRODUCT_CODE];
+
+  visiblePrice.textContent =
+    "完全版 ¥" +
+    price.toLocaleString("ja-JP") +
+    "（税込）";
+}
+
+if (!PRODUCT_SALEABLE && payButton) {
+  payButton.disabled = true;
+  payButton.textContent = "近日公開";
+  payButton.setAttribute(
+    "aria-disabled",
+    "true"
+  );
+  payButton.style.opacity = "0.55";
+  payButton.style.cursor = "not-allowed";
+}
+
+document.title =
+  C.title + " | DESTINY CODE";
+
+document.getElementById(
+  "kicker"
+).textContent =
+  C.kicker;
+
+document.getElementById(
+  "title"
+).textContent =
+  C.title;
+
+document.getElementById(
+  "introText"
+).textContent =
+  C.intro;
+
+document.getElementById(
+  "submitButton"
+).textContent =
+  C.button;
+
+/* STEP 96-E: unreleased product UI */
+const previewSubmitButton =
+  document.getElementById("submitButton");
+
+if (!PRODUCT_SALEABLE) {
+  previewSubmitButton.disabled = true;
+  previewSubmitButton.textContent = "\u8fd1\u65e5\u516c\u958b";
+  previewSubmitButton.setAttribute("aria-disabled", "true");
+
+  const quickGuide = document.querySelector(".quick");
+  if (quickGuide) {
+    quickGuide.textContent = "\u8fd1\u65e5\u516c\u958b";
+  }
+}
+
+
+document.getElementById(
+  "categoryAnalysis"
+).textContent =
+  C.analysis;
+
+document.getElementById(
+  "resultTitle"
+).textContent =
+  C.result;
+
+document.getElementById(
+  "themeImage"
+).src =
+  C.image;
+
+
+/* LOCK LIST */
+
+const lockList =
+  document.getElementById(
+    "lockList"
+  );
+
+C.locks.forEach(function(text){
+
+  const row =
+    document.createElement(
+      "div"
+    );
+
+  row.className =
+    "lock-item";
+
+  row.innerHTML =
+    '<span class="lock">🔒</span>' +
+    '<span></span>';
+
+  row.lastElementChild.textContent =
+    text;
+
+  lockList.appendChild(row);
+
+});
+
+
+/* SELECT OPTIONS */
+
+const month =
+  document.getElementById("month");
+
+const day =
+  document.getElementById("day");
+
+const hour =
+  document.getElementById("hour");
+
+const minute =
+  document.getElementById("minute");
+
+for(let i=1;i<=12;i++){
+
+  const o =
+    document.createElement("option");
+
+  o.value=i;
+  o.textContent=i+"月";
+
+  month.appendChild(o);
+}
+
+for(let i=1;i<=31;i++){
+
+  const o =
+    document.createElement("option");
+
+  o.value=i;
+  o.textContent=i+"日";
+
+  day.appendChild(o);
+}
+
+for(let i=0;i<=23;i++){
+
+  const o =
+    document.createElement("option");
+
+  o.value=i;
+
+  o.textContent =
+    String(i).padStart(2,"0")
+    +"時";
+
+  hour.appendChild(o);
+}
+
+for(let i=0;i<=59;i++){
+
+  const o =
+    document.createElement("option");
+
+  o.value=i;
+
+  o.textContent =
+    String(i).padStart(2,"0")
+    +"分";
+
+  minute.appendChild(o);
+}
+
+
+/* UNKNOWN TIME */
+
+const unknown =
+  document.getElementById(
+    "unknownTime"
+  );
+
+unknown.addEventListener(
+  "change",
+  function(){
+
+    hour.disabled =
+      this.checked;
+
+    minute.disabled =
+      this.checked;
+
+    if(this.checked){
+      hour.value="";
+      minute.value="";
+    }
+  }
+);
+
+
+/* VALIDATE */
+
+function validBirthDate(
+  y,
+  m,
+  d
+){
+
+  const dt =
+    new Date(
+      Number(y),
+      Number(m)-1,
+      Number(d)
+    );
+
+  return (
+    dt.getFullYear() === Number(y)
+    &&
+    dt.getMonth() === Number(m)-1
+    &&
+    dt.getDate() === Number(d)
+  );
+}
+
+
+/* ANALYSIS ANIMATION */
+
+function runAnalysis(){
+
+  const steps=[
+    ["step1","state1"],
+    ["step2","state2"],
+    ["step3","state3"],
+    ["step4","state4"]
+  ];
+
+  steps.forEach(
+    function(pair,index){
+
+      setTimeout(
+        function(){
+
+          const step =
+            document.getElementById(
+              pair[0]
+            );
+
+          const state =
+            document.getElementById(
+              pair[1]
+            );
+
+          step.classList.add(
+            "active"
+          );
+
+          state.textContent="···";
+
+        },
+        index*550
+      );
+
+      setTimeout(
+        function(){
+
+          const step =
+            document.getElementById(
+              pair[0]
+            );
+
+          const state =
+            document.getElementById(
+              pair[1]
+            );
+
+          step.classList.remove(
+            "active"
+          );
+
+          step.classList.add(
+            "done"
+          );
+
+          state.textContent="✓";
+
+        },
+        index*550+500
+      );
+
+    }
+  );
+
+  /*
+   * Result is shown only after
+   * the real Calculation API succeeds.
+   */
+}
+
+
+/* REAL CALCULATION API */
+
+async function calculateSaju(payload) {
+  if (PRODUCT_CODE !== "love") {
+    throw new Error("Preview not available for this product");
+  }
+
+  const response = await fetch(
+    destinyRequireApi() + "/preview/love",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        birth: payload
+      })
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Preview API error");
+  }
+
+  const data = await response.json();
+
+  if (
+    !data.ok ||
+    data.product_code !== "love" ||
+    !data.calculation ||
+    !data.calculation.day_master ||
+    !data.calculation.five_elements
+  ) {
+    throw new Error("Invalid preview response");
+  }
+
+  return data.calculation;
+}
+
+
+/* APPLY REAL FACTS */
+
+function applyCalculation(
+  data
+){
+
+  /*
+   * Day Master
+   */
+
+  const dayMaster =
+    data
+    .day_master
+    .stem
+    .hanja;
+
+  document.getElementById(
+    "dayMaster"
+  ).textContent =
+    dayMaster;
+
+
+  /*
+   * Five Elements
+   *
+   * IMPORTANT:
+   * This is visible eight-character
+   * distribution, NOT strength.
+   */
+
+  document.getElementById(
+    "fiveElements"
+  ).textContent =
+    data
+    .five_elements
+    .display;
+
+
+  /*
+   * Current Major Luck
+   */
+
+  const major =
+    data.current_major_luck;
+
+  let majorText =
+    "該当なし";
+
+  if(major){
+
+    majorText =
+      major.ganzhi
+      +
+      " "
+      +
+      major.start_year
+      +
+      "–"
+      +
+      major.end_year;
+  }
+
+  document.getElementById(
+    "majorLuck"
+  ).textContent =
+    majorText;
+}
+
+
+/* SHOW RESULT */
+
+// 결제 후에만 호출 - 결제 전에는 사용하지 않음
+async function fetchReadingAfterPayment(birthInput, category){
+  try{
+    const response = await fetch("http://127.0.0.1:8766/reading",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        year: birthInput.year,
+        month: birthInput.month,
+        day: birthInput.day,
+        hour: birthInput.hour || 12,
+        minute: birthInput.minute || 0,
+        gender: birthInput.gender || "female",
+        timezone: "Asia/Tokyo",
+        category: category || "love"
+      })
+    });
+    return await response.json();
+  } catch(e){
+    console.error("Reading API error:", e);
+    return null;
+  }
+}
+
+function showResult(){
+
+  document.getElementById(
+    "analysis"
+  ).classList.remove(
+    "active"
+  );
+
+  document.getElementById(
+    "result"
+  ).classList.add(
+    "active"
+  );
+
+  /*
+   * PRE-PAYMENT:
+   * Calculation facts only.
+   * No LLM call.
+   */
+  const calc =
+    window.destinyCalculation;
+
+  if (calc) {
+
+    const dm =
+      (
+        calc.day_master &&
+        calc.day_master.stem
+      )
+      ? (
+          calc.day_master
+              .stem
+              .hanja || ""
+        )
+      : "";
+
+    const major =
+      calc.current_major_luck
+      || {};
+
+    const h1 =
+      document.getElementById(
+        "hookLine1"
+      );
+
+    const h2 =
+      document.getElementById(
+        "hookLine2"
+      );
+
+    const h3 =
+      document.getElementById(
+        "hookLine3"
+      );
+
+    const h4 =
+      document.getElementById(
+        "hookLine4"
+      );
+
+    if (h1) {
+      h1.textContent =
+        "あなたの命式を確認しました。";
+    }
+
+    if (h2) {
+      h2.textContent =
+        "日主は「" +
+        dm +
+        "」。五行の配置と現在の大運も算出されています。";
+    }
+
+    if (h3) {
+      h3.textContent =
+        "完全版では、命式に現れている要素を組み合わせ、" +
+        "このテーマで注目したいポイントを個別に読み解きます。";
+    }
+
+    if (h4) {
+      h4.textContent =
+        "ここから先は完全版でご覧いただけます。";
+    }
+
+    const payButton =
+      document.getElementById(
+        "payButton"
+      );
+
+    if (payButton) {
+      payButton.disabled = !PRODUCT_SALEABLE;
+    }
+  }
+
+  window.scrollTo({
+    top:0,
+    behavior:"smooth"
+  });
+}
+
+
+/* SUBMIT */
+
+document.getElementById(
+  "birthForm"
+).addEventListener(
+  "submit",
+  async function(e){
+
+    e.preventDefault();
+
+    if (PRODUCT_CODE !== "love") {
+      alert("この商品の無料鑑定は近日公開予定です。");
+      return;
+    }
+
+    const y =
+      document.getElementById(
+        "year"
+      ).value;
+
+    const m =
+      month.value;
+
+    const d =
+      day.value;
+
+    const place =
+      document.getElementById(
+        "birthPlace"
+      ).value.trim();
+
+    const gender =
+      document.querySelector(
+        'input[name="gender"]:checked'
+      );
+
+    if(
+      !y ||
+      !m ||
+      !d ||
+      !place ||
+      !gender
+    ){
+      alert(
+        "必須項目を入力してください。"
+      );
+      return;
+    }
+
+    if(!validBirthDate(y,m,d)){
+      alert(
+        "正しい生年月日を入力してください。"
+      );
+      return;
+    }
+
+    if(
+      !unknown.checked
+      &&
+      (
+        hour.value === ""
+        ||
+        minute.value === ""
+      )
+    ){
+      alert(
+        "出生時間を入力するか、「出生時間がわからない」を選択してください。"
+      );
+      return;
+    }
+
+    /*
+     * Store only temporarily in browser memory.
+     * Real API connection comes next.
+     */
+
+    window.destinyBirthInput={
+      year:Number(y),
+      month:Number(m),
+      day:Number(d),
+      gender:gender.value,
+      birth_time_unknown:
+        unknown.checked,
+      hour:
+        unknown.checked
+        ? null
+        : Number(hour.value),
+      minute:
+        unknown.checked
+        ? null
+        : Number(minute.value),
+      birth_place:place,
+      reading_type:type
+    };
+
+    document.getElementById(
+      "entry"
+    ).style.display="none";
+
+    document.getElementById(
+      "analysis"
+    ).classList.add(
+      "active"
+    );
+
+    window.scrollTo({
+      top:0,
+      behavior:"auto"
+    });
+
+    runAnalysis();
+
+    try{
+
+      const calculation =
+        await calculateSaju(
+          window.destinyBirthInput
+        );
+
+      window.destinyCalculation =
+        calculation;
+
+      /*
+       * Keep a short minimum
+       * animation duration.
+       */
+
+      await new Promise(
+        function(resolve){
+          setTimeout(
+            resolve,
+            2800
+          );
+        }
+      );
+
+      applyCalculation(
+        calculation
+      );
+
+      showResult();
+
+    }
+    catch(error){
+
+      console.error(
+        error
+      );
+
+      document.getElementById(
+        "analysis"
+      ).classList.remove(
+        "active"
+      );
+
+      document.getElementById(
+        "entry"
+      ).style.display =
+        "block";
+
+      alert(
+        "命式の計算中にエラーが発生しました。入力内容をご確認ください。"
+      );
+    }
+
+  }
+);
+
+
+/* PADDLE PAYMENT AND FULFILLMENT STATUS */
+
+let destinyPaddleInitialized = false;
+let destinyCurrentOrderId = null;
+let destinyCurrentProgressToken = null;
+let destinyCheckoutCompleted = false;
+
+function destinyPaymentMessage(text) {
+  const section = document.getElementById("fullReadingResult");
+  const body = document.getElementById("fullReadingBody");
+
+  if (!section || !body) return;
+
+  body.textContent = "";
+  const message = document.createElement("p");
+  message.textContent = text;
+  message.style.lineHeight = "2";
+  message.style.textAlign = "center";
+  body.appendChild(message);
+
+  section.style.display = "block";
+  section.scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+  });
+}
+
+async function ensurePaddleReady() {
+  if (destinyPaddleInitialized) return;
+
+  const response = await fetch(
+    destinyRequireApi() + "/paddle/config"
+  );
+
+  if (!response.ok) {
+    throw new Error("Paddle config HTTP error");
+  }
+
+  const config = await response.json();
+
+  if (!config.ok || !config.client_token || !config.love_price_id) {
+    throw new Error("Paddle configuration failed");
+  }
+
+  window.destinyPaddleConfig = config;
+
+  Paddle.Environment.set(
+    config.environment === "live" ? "production" : "sandbox"
+  );
+
+  Paddle.Initialize({
+    token: config.client_token,
+    eventCallback: function(event) {
+      if (event && event.name === "checkout.completed") {
+        destinyCheckoutCompleted = true;
+        window.dispatchEvent(
+          new CustomEvent("destiny:paddle-completed")
+        );
+      }
+    }
+  });
+
+  destinyPaddleInitialized = true;
+}
+
+async function destinyGetProgress() {
+  if (!destinyCurrentOrderId || !destinyCurrentProgressToken) {
+    throw new Error("Order authorization missing");
+  }
+
+  const response = await fetch(
+    destinyRequireApi() + "/paddle/progress/"
+      + encodeURIComponent(destinyCurrentOrderId),
+    {
+      headers: {
+        "Authorization": "Bearer " + destinyCurrentProgressToken
+      },
+      cache: "no-store"
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Order progress unavailable");
+  }
+
+  const result = await response.json();
+
+  if (!result.ok || result.order_id !== destinyCurrentOrderId) {
+    throw new Error("Order progress mismatch");
+  }
+
+  return result;
+}
+
+function destinyStatusText(status) {
+  const messages = {
+    pending_payment:
+      "お支払いの確認をお待ちしています。決済済みの場合は、再購入せず確認をお待ちください。",
+    paid:
+      "お支払いを確認しました。鑑定書の準備を進めています。",
+    generating:
+      "鑑定書を作成しています。ページを閉じてもサーバーで処理を続けます。",
+    generated:
+      "鑑定書が完成しました。メール送信の準備を進めています。",
+    delivering:
+      "鑑定書をメールでお届けする処理を進めています。",
+    delivered:
+      "鑑定書をメールでお送りしました。ご購入時のメールをご確認ください。",
+    delayed:
+      "お届け状況の確認が必要です。再購入せずサポートへお問い合わせください。"
+  };
+
+  return messages[status] ||
+    "注文状況を確認しています。再購入せずお待ちください。";
+}
+
+async function destinyTrackOrder() {
+  const button = document.getElementById("payButton");
+
+  for (let attempt = 0; attempt < 120; attempt++) {
+    const progress = await destinyGetProgress();
+    const status = progress.status;
+
+    destinyPaymentMessage(destinyStatusText(status));
+
+    if (button) {
+      button.textContent =
+        status === "delivered" ? "メール送信完了" : "注文状況を確認中";
+    }
+
+    if (status === "delivered" || status === "delayed") {
+      return status;
+    }
+
+    await new Promise(function(resolve) {
+      setTimeout(resolve, 3000);
+    });
+  }
+
+  destinyPaymentMessage(
+    "注文の処理はサーバーで継続します。再購入せず、ご購入時のメールをご確認ください。"
+  );
+
+  return "pending";
+}
+
+document.getElementById("payButton").addEventListener(
+  "click",
+  async function() {
+    if (!PRODUCT_SALEABLE || PRODUCT_CODE !== "love") {
+      alert("この商品は近日公開予定です。");
+      return;
+    }
+
+    if (!window.destinyBirthInput) {
+      alert("先に生年月日をご入力ください。");
+      return;
+    }
+
+    if (destinyCurrentOrderId) {
+      destinyPaymentMessage(
+        "すでに注文が作成されています。重複購入を防ぐため、再購入せず注文状況をご確認ください。"
+      );
+      return;
+    }
+
+    const button = document.getElementById("payButton");
+    const originalText = button.textContent;
+
+    button.disabled = true;
+    let orderRequestStarted = false;
+
+    try {
+      button.textContent = "決済の準備中...";
+
+      await ensurePaddleReady();
+
+      const apiBase = destinyRequireApi();
+      orderRequestStarted = true;
+
+      const response = await fetch(
+        apiBase + "/paddle/order",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            category: PRODUCT_CODE,
+            name: (
+              document.getElementById("customerName")?.value || ""
+            ).trim().slice(0, 20),
+            birth: window.destinyBirthInput
+          })
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Order creation HTTP error");
+      }
+
+      const checkout = await response.json();
+
+      if (
+        !checkout.ok ||
+        !checkout.order_id ||
+        !checkout.progress_token
+      ) {
+        throw new Error("Order authorization failed");
+      }
+
+      destinyCurrentOrderId = checkout.order_id;
+      destinyCurrentProgressToken = checkout.progress_token;
+      destinyCheckoutCompleted = false;
+
+      destinyPaymentMessage(
+        "決済画面を開いています。お支払い後、注文状況をご案内します。"
+      );
+
+      Paddle.Checkout.open({
+          settings: {
+            locale: "ja"
+          },
+        items: [{
+          priceId: window.destinyPaddleConfig.love_price_id,
+          quantity: 1
+        }],
+        customData: {
+          order_id: checkout.order_id
+        }
+      });
+
+      button.textContent = "注文状況を確認中";
+
+      /*
+       * Payment confirmation comes only from the server.
+       * Paddle checkout events are not proof of payment.
+       */
+      await destinyTrackOrder();
+
+    } catch (error) {
+      console.error("Payment flow error:", error);
+
+      if (destinyCurrentOrderId) {
+        destinyPaymentMessage(
+          "注文状況を確認できません。決済済みの可能性があるため、再購入せずサポートへお問い合わせください。"
+        );
+        button.textContent = "注文状況の確認が必要です";
+      } else if (orderRequestStarted) {
+        destinyPaymentMessage(
+          "\u6ce8\u6587\u4f5c\u6210\u306e\u7d50\u679c\u3092\u78ba\u8a8d\u3067\u304d\u307e\u305b\u3093\u3002\u91cd\u8907\u6c7a\u6e08\u3092\u9632\u3050\u305f\u3081\u3001\u518d\u8cfc\u5165\u305b\u305a\u30b5\u30dd\u30fc\u30c8\u3078\u304a\u554f\u3044\u5408\u308f\u305b\u304f\u3060\u3055\u3044\u3002"
+        );
+        button.textContent = "\u6ce8\u6587\u72b6\u6cc1\u306e\u78ba\u8a8d\u304c\u5fc5\u8981\u3067\u3059";
+      } else {
+        destinyPaymentMessage(
+          "決済を開始できませんでした。しばらくしてからお試しください。"
+        );
+        button.disabled = false;
+        button.textContent = originalText;
+      }
+    }
+  }
+);
+
+</script>
+
+
+<script id="birthPlaceSimpleScript">
+(function(){
+  function syncBirthPlace(){
+    var s=document.querySelector('input[name="birthPlaceGroup"]:checked');
+    var h=document.getElementById("birthPlace");
+    if(s&&h){h.value=s.value;}
+  }
+  document.addEventListener("change",function(e){
+    if(e.target&&e.target.name==="birthPlaceGroup"){syncBirthPlace();}
+  });
+  document.addEventListener("DOMContentLoaded",syncBirthPlace);
+})();
+</script>
+
+</body>
+</html>
+
+
+
+
