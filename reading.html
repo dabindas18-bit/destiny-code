@@ -1269,7 +1269,7 @@ input::placeholder{
       id="payButton"
       type="button"
     >
-      私の恋愛の続きを読む
+      販売開始までしばらくお待ちください
     </button>
 
     <div
@@ -1286,7 +1286,7 @@ input::placeholder{
     </div>
 
     <div class="payment-note">
-      現在はDEV決済テストモードです
+      現在、決済システムを準備しております。
     </div>
 
   </section>
@@ -2097,7 +2097,9 @@ function showResult(){
       );
 
     if (payButton) {
-      payButton.disabled = !PRODUCT_SALEABLE;
+      payButton.disabled = true;
+payButton.textContent = "決済準備中";
+payButton.setAttribute("aria-disabled", "true");
     }
   }
 
@@ -2638,6 +2640,20 @@ document.getElementById("payButton").addEventListener(
 </footer>
 <!-- DESTINY CODE LEGAL FOOTER END -->
 
+
+<script>
+/* DESTINY CODE PAYMENT UI LOCK */
+document.addEventListener("DOMContentLoaded", function() {
+  const button = document.getElementById("payButton");
+  if (!button) return;
+
+  button.disabled = true;
+  button.textContent = "決済準備中";
+  button.setAttribute("aria-disabled", "true");
+  button.style.opacity = "0.55";
+  button.style.cursor = "not-allowed";
+});
+</script>
 </body>
 </html>
 
