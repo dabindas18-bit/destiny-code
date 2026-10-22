@@ -2432,6 +2432,11 @@ async function destinyTrackOrder() {
 document.getElementById("payButton").addEventListener(
   "click",
   async function() {
+    // DESTINY CODE PAYMENT LOCK
+    // Checkout disabled until approved payment provider is connected.
+    alert("現在、決済システムを準備しております。販売開始までしばらくお待ちください。");
+    return;
+
     if (!PRODUCT_SALEABLE || PRODUCT_CODE !== "love") {
       alert("この商品は近日公開予定です。");
       return;
@@ -2563,6 +2568,75 @@ document.getElementById("payButton").addEventListener(
   document.addEventListener("DOMContentLoaded",syncBirthPlace);
 })();
 </script>
+
+
+<!-- DESTINY CODE LEGAL FOOTER START -->
+<style>
+.destiny-legal-footer {
+  padding: 35px 20px 45px;
+  text-align: center;
+  border-top: 1px solid rgba(216,182,107,.24);
+  background: #0b1022;
+  font-family: "Noto Serif JP", "Yu Mincho", serif;
+}
+
+.destiny-legal-footer nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px 25px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.destiny-legal-footer a {
+  color: #d8b66b;
+  font-size: 12px;
+  line-height: 1.8;
+  text-decoration: none;
+  transition: opacity .2s ease;
+}
+
+.destiny-legal-footer a:hover {
+  opacity: .7;
+}
+
+.destiny-legal-footer .copyright {
+  margin-top: 25px;
+  color: #abb2c5;
+  font-size: 11px;
+  letter-spacing: .15em;
+}
+
+@media (max-width:600px) {
+  .destiny-legal-footer {
+    padding: 30px 15px 40px;
+  }
+
+  .destiny-legal-footer nav {
+    gap: 10px 18px;
+  }
+
+  .destiny-legal-footer a {
+    font-size: 11px;
+  }
+}
+</style>
+
+<footer class="destiny-legal-footer">
+  <nav aria-label="Legal information">
+    <a href="index.html">HOME</a>
+    <a href="legal.html">特定商取引法に基づく表記</a>
+    <a href="privacy.html">プライバシーポリシー</a>
+    <a href="refund.html">返金・キャンセルポリシー</a>
+    <a href="mailto:dabindas18@gmail.com">お問い合わせ</a>
+  </nav>
+
+  <div class="copyright">
+    © DESTINY CODE
+  </div>
+</footer>
+<!-- DESTINY CODE LEGAL FOOTER END -->
 
 </body>
 </html>
