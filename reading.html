@@ -795,7 +795,7 @@ input::placeholder{
 
 </style>
 
-<script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
+
 
 <style id="birthPlaceSimpleStyle">
 .birth-place-options{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
@@ -1269,7 +1269,7 @@ input::placeholder{
       id="payButton"
       type="button"
     >
-      販売開始までしばらくお待ちください
+      私の恋愛の続きを読む
     </button>
 
     <div
@@ -1286,8 +1286,7 @@ input::placeholder{
     </div>
 
     <div class="payment-note">
-      現在、決済システムを準備しております。
-    </div>
+      現在、PayPal決済の準備中です</div>
 
   </section>
 
@@ -1479,8 +1478,31 @@ const DESTINY_LOCAL =
 const DESTINY = {
   apiBase:
     window.DESTINY_API_BASE ||
-    (DESTINY_LOCAL ? "http://127.0.0.1:8770" : "")
+    (DESTINY_LOCAL ? "http://127.0.0.1:8770" : "https://campbell-roles-trivia-packed.trycloudflare.com")
 };
+
+const DESTINY_PAYPAL = {
+  apiBase:
+    window.DESTINY_PAYPAL_API_BASE ||
+    (DESTINY_LOCAL
+      ? "http://127.0.0.1:8771"
+      : "https://activities-successfully-genome-consequence.trycloudflare.com")
+};
+
+function destinyRequirePayPalApi() {
+  if (!DESTINY_PAYPAL.apiBase) {
+    throw new Error("PayPal HTTPS API endpoint is not configured");
+  }
+
+  if (
+    !DESTINY_LOCAL &&
+    !DESTINY_PAYPAL.apiBase.startsWith("https://")
+  ) {
+    throw new Error("Public PayPal API requires HTTPS");
+  }
+
+  return DESTINY_PAYPAL.apiBase.replace(/\/$/, "");
+}
 
 function destinyRequireApi() {
   if (!DESTINY.apiBase) {
@@ -2097,9 +2119,7 @@ function showResult(){
       );
 
     if (payButton) {
-      payButton.disabled = true;
-payButton.textContent = "決済準備中";
-payButton.setAttribute("aria-disabled", "true");
+      payButton.disabled = !PRODUCT_SALEABLE;
     }
   }
 
@@ -2270,14 +2290,8 @@ document.getElementById(
       ).style.display =
         "block";
 
-      const apiNotConfigured =
-        error && error.message ===
-        "HTTPS API endpoint is not configured";
-
       alert(
-        apiNotConfigured
-          ? "現在、鑑定システムの準備を進めております。しばらくしてからお試しください。"
-          : "命式の計算中にエラーが発生しました。入力内容をご確認ください。"
+        "命式の計算中にエラーが発生しました。入力内容をご確認ください。"
       );
     }
 
@@ -2285,12 +2299,13 @@ document.getElementById(
 );
 
 
-/* PADDLE PAYMENT AND FULFILLMENT STATUS */
+/* PAYPAL SANDBOX PAYMENT */
 
-let destinyPaddleInitialized = false;
+const DESTINY_PAYPAL_TEST_ENABLED = false;
+const DESTINY_PAYPAL_SESSION_KEY = "destiny_paypal_love_checkout";
+
 let destinyCurrentOrderId = null;
-let destinyCurrentProgressToken = null;
-let destinyCheckoutCompleted = false;
+let destinyCheckoutBusy = false;
 
 function destinyPaymentMessage(text) {
   const section = document.getElementById("fullReadingResult");
@@ -2299,259 +2314,308 @@ function destinyPaymentMessage(text) {
   if (!section || !body) return;
 
   body.textContent = "";
-  const message = document.createElement("p");
-  message.textContent = text;
-  message.style.lineHeight = "2";
-  message.style.textAlign = "center";
-  body.appendChild(message);
 
+  const p = document.createElement("p");
+  p.textContent = text;
+  p.style.lineHeight = "2";
+  p.style.textAlign = "center";
+
+  body.appendChild(p);
   section.style.display = "block";
+
   section.scrollIntoView({
     behavior: "smooth",
     block: "start"
   });
 }
 
-async function ensurePaddleReady() {
-  if (destinyPaddleInitialized) return;
-
-  const response = await fetch(
-    destinyRequireApi() + "/paddle/config"
-  );
-
-  if (!response.ok) {
-    throw new Error("Paddle config HTTP error");
+function destinyReadPayPalSession() {
+  try {
+    const raw = sessionStorage.getItem(
+      DESTINY_PAYPAL_SESSION_KEY
+    );
+    return raw ? JSON.parse(raw) : null;
+  } catch (error) {
+    return null;
   }
-
-  const config = await response.json();
-
-  if (!config.ok || !config.client_token || !config.love_price_id) {
-    throw new Error("Paddle configuration failed");
-  }
-
-  window.destinyPaddleConfig = config;
-
-  Paddle.Environment.set(
-    config.environment === "live" ? "production" : "sandbox"
-  );
-
-  Paddle.Initialize({
-    token: config.client_token,
-    eventCallback: function(event) {
-      if (event && event.name === "checkout.completed") {
-        destinyCheckoutCompleted = true;
-        window.dispatchEvent(
-          new CustomEvent("destiny:paddle-completed")
-        );
-      }
-    }
-  });
-
-  destinyPaddleInitialized = true;
 }
 
-async function destinyGetProgress() {
-  if (!destinyCurrentOrderId || !destinyCurrentProgressToken) {
-    throw new Error("Order authorization missing");
+function destinySavePayPalSession(data) {
+  sessionStorage.setItem(
+    DESTINY_PAYPAL_SESSION_KEY,
+    JSON.stringify(data)
+  );
+}
+
+function destinyClearPayPalSession() {
+  sessionStorage.removeItem(
+    DESTINY_PAYPAL_SESSION_KEY
+  );
+}
+
+function destinyAskCustomerEmail() {
+  const email = window.prompt(
+    "\u9451\u5b9a\u66f8\u3092\u304a\u5c4a\u3051\u3059\u308b\u30e1\u30fc\u30eb\u30a2\u30c9\u30ec\u30b9\u3092\u3054\u5165\u529b\u304f\u3060\u3055\u3044\u3002"
+  );
+
+  if (email === null) return null;
+
+  const cleaned = email.trim();
+
+  if (
+    !cleaned ||
+    cleaned.length > 254 ||
+    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleaned)
+  ) {
+    alert("\u6b63\u3057\u3044\u30e1\u30fc\u30eb\u30a2\u30c9\u30ec\u30b9\u3092\u3054\u5165\u529b\u304f\u3060\u3055\u3044\u3002");
+    return null;
   }
 
+  return cleaned;
+}
+
+async function destinyCreatePayPalOrder() {
+  if (!DESTINY_PAYPAL_TEST_ENABLED) {
+    throw new Error("PayPal Sandbox checkout disabled");
+  }
+
+  const email = destinyAskCustomerEmail();
+  if (!email) return null;
+
+  const name = (
+    document.getElementById("customerName")?.value || ""
+  ).trim().slice(0, 20) || "\u304a\u5ba2\u69d8";
+
   const response = await fetch(
-    destinyRequireApi() + "/paddle/progress/"
-      + encodeURIComponent(destinyCurrentOrderId),
+    destinyRequirePayPalApi() + "/paypal/create-order",
     {
+      method: "POST",
       headers: {
-        "Authorization": "Bearer " + destinyCurrentProgressToken
+        "Content-Type": "application/json"
       },
-      cache: "no-store"
+      body: JSON.stringify({
+        customer_name: name,
+        customer_email: email,
+        birth: window.destinyBirthInput
+      })
     }
   );
 
   if (!response.ok) {
-    throw new Error("Order progress unavailable");
+    throw new Error("PayPal order creation failed");
+  }
+
+  const checkout = await response.json();
+
+  if (
+    !checkout.ok ||
+    !checkout.order_id ||
+    !checkout.checkout_token ||
+    !checkout.paypal_order_id ||
+    !checkout.approval_url ||
+    checkout.environment !== "sandbox" ||
+    checkout.amount !== 980 ||
+    checkout.currency !== "JPY"
+  ) {
+    throw new Error("Invalid PayPal checkout response");
+  }
+
+  const approval = new URL(checkout.approval_url);
+
+  if (
+    approval.protocol !== "https:" ||
+    ![
+      "www.sandbox.paypal.com",
+      "www.paypal.com"
+    ].includes(approval.hostname)
+  ) {
+    throw new Error("Unexpected PayPal approval URL");
+  }
+
+  destinySavePayPalSession({
+    order_id: checkout.order_id,
+    checkout_token: checkout.checkout_token,
+    paypal_order_id: checkout.paypal_order_id
+  });
+
+  destinyCurrentOrderId = checkout.order_id;
+
+  return checkout.approval_url;
+}
+
+async function destinyCapturePayPalOrder(session, paypalToken) {
+  if (!DESTINY_PAYPAL_TEST_ENABLED) {
+    throw new Error("PayPal Sandbox capture disabled");
+  }
+
+  const response = await fetch(
+    destinyRequirePayPalApi() + "/paypal/capture-order",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        order_id: session.order_id,
+        checkout_token: session.checkout_token,
+        paypal_token: paypalToken
+      })
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("PayPal capture verification failed");
   }
 
   const result = await response.json();
 
-  if (!result.ok || result.order_id !== destinyCurrentOrderId) {
-    throw new Error("Order progress mismatch");
+  if (
+    !result.ok ||
+    result.order_id !== session.order_id ||
+    result.status !== "paid"
+  ) {
+    throw new Error("PayPal payment not verified");
   }
 
   return result;
 }
 
-function destinyStatusText(status) {
-  const messages = {
-    pending_payment:
-      "お支払いの確認をお待ちしています。決済済みの場合は、再購入せず確認をお待ちください。",
-    paid:
-      "お支払いを確認しました。鑑定書の準備を進めています。",
-    generating:
-      "鑑定書を作成しています。ページを閉じてもサーバーで処理を続けます。",
-    generated:
-      "鑑定書が完成しました。メール送信の準備を進めています。",
-    delivering:
-      "鑑定書をメールでお届けする処理を進めています。",
-    delivered:
-      "鑑定書をメールでお送りしました。ご購入時のメールをご確認ください。",
-    delayed:
-      "お届け状況の確認が必要です。再購入せずサポートへお問い合わせください。"
-  };
+async function destinyHandlePayPalReturn() {
+  if (!DESTINY_PAYPAL_TEST_ENABLED) return;
 
-  return messages[status] ||
-    "注文状況を確認しています。再購入せずお待ちください。";
-}
+  const params = new URLSearchParams(location.search);
 
-async function destinyTrackOrder() {
-  const button = document.getElementById("payButton");
+  const returned = params.get("paypal_return") === "1";
+  const cancelled = params.get("paypal_cancel") === "1";
 
-  for (let attempt = 0; attempt < 120; attempt++) {
-    const progress = await destinyGetProgress();
-    const status = progress.status;
+  if (!returned && !cancelled) return;
 
-    destinyPaymentMessage(destinyStatusText(status));
+  const session = destinyReadPayPalSession();
 
-    if (button) {
-      button.textContent =
-        status === "delivered" ? "メール送信完了" : "注文状況を確認中";
-    }
+  if (session?.order_id) {
+    destinyCurrentOrderId = session.order_id;
+  }
 
-    if (status === "delivered" || status === "delayed") {
-      return status;
-    }
+  if (cancelled) {
+    destinyPaymentMessage(
+      "\u6c7a\u6e08\u306f\u30ad\u30e3\u30f3\u30bb\u30eb\u3055\u308c\u307e\u3057\u305f\u3002"
+    );
+    destinyClearPayPalSession();
+    return;
+  }
 
-    await new Promise(function(resolve) {
-      setTimeout(resolve, 3000);
-    });
+  if (!session) {
+    destinyPaymentMessage(
+      "\u6ce8\u6587\u60c5\u5831\u3092\u78ba\u8a8d\u3067\u304d\u307e\u305b\u3093\u3002\u518d\u8cfc\u5165\u305b\u305a\u30b5\u30dd\u30fc\u30c8\u3078\u304a\u554f\u3044\u5408\u308f\u305b\u304f\u3060\u3055\u3044\u3002"
+    );
+    return;
+  }
+
+  const paypalToken = params.get("token");
+
+  if (
+    !paypalToken ||
+    paypalToken !== session.paypal_order_id
+  ) {
+    destinyPaymentMessage(
+      "\u6c7a\u6e08\u60c5\u5831\u304c\u4e00\u81f4\u3057\u307e\u305b\u3093\u3002\u518d\u8cfc\u5165\u305b\u305a\u304a\u554f\u3044\u5408\u308f\u305b\u304f\u3060\u3055\u3044\u3002"
+    );
+    return;
   }
 
   destinyPaymentMessage(
-    "注文の処理はサーバーで継続します。再購入せず、ご購入時のメールをご確認ください。"
+    "PayPal\u306e\u304a\u652f\u6255\u3044\u72b6\u6cc1\u3092\u78ba\u8a8d\u3057\u3066\u3044\u307e\u3059\u3002"
   );
 
-  return "pending";
+  try {
+    await destinyCapturePayPalOrder(
+      session,
+      paypalToken
+    );
+
+    destinyPaymentMessage(
+      "\u304a\u652f\u6255\u3044\u3092\u78ba\u8a8d\u3057\u307e\u3057\u305f\u3002\u9451\u5b9a\u66f8\u3092\u4f5c\u6210\u3057\u3001\u30e1\u30fc\u30eb\u3067\u304a\u5c4a\u3051\u3057\u307e\u3059\u3002"
+    );
+
+    destinyClearPayPalSession();
+
+  } catch (error) {
+    console.error("PayPal verification failed:", error);
+
+    destinyPaymentMessage(
+      "\u6c7a\u6e08\u72b6\u6cc1\u3092\u78ba\u8a8d\u3067\u304d\u307e\u305b\u3093\u3002\u518d\u8cfc\u5165\u305b\u305a\u30b5\u30dd\u30fc\u30c8\u3078\u304a\u554f\u3044\u5408\u308f\u305b\u304f\u3060\u3055\u3044\u3002"
+    );
+  }
 }
 
 document.getElementById("payButton").addEventListener(
   "click",
   async function() {
-    // DESTINY CODE PAYMENT LOCK
-    // Checkout disabled until approved payment provider is connected.
-    alert("現在、決済システムを準備しております。販売開始までしばらくお待ちください。");
-    return;
+
+    if (!DESTINY_PAYPAL_TEST_ENABLED) {
+      alert(
+        "\u73fe\u5728\u3001\u6c7a\u6e08\u30b7\u30b9\u30c6\u30e0\u3092\u6e96\u5099\u3057\u3066\u304a\u308a\u307e\u3059\u3002"
+      );
+      return;
+    }
 
     if (!PRODUCT_SALEABLE || PRODUCT_CODE !== "love") {
-      alert("この商品は近日公開予定です。");
+      alert("\u3053\u306e\u5546\u54c1\u306f\u8fd1\u65e5\u516c\u958b\u4e88\u5b9a\u3067\u3059\u3002");
       return;
     }
 
     if (!window.destinyBirthInput) {
-      alert("先に生年月日をご入力ください。");
+      alert("\u5148\u306b\u751f\u5e74\u6708\u65e5\u3092\u3054\u5165\u529b\u304f\u3060\u3055\u3044\u3002");
       return;
     }
 
-    if (destinyCurrentOrderId) {
+    if (
+      destinyCheckoutBusy ||
+      destinyCurrentOrderId ||
+      destinyReadPayPalSession()
+    ) {
       destinyPaymentMessage(
-        "すでに注文が作成されています。重複購入を防ぐため、再購入せず注文状況をご確認ください。"
+        "\u3059\u3067\u306b\u6ce8\u6587\u304c\u3042\u308a\u307e\u3059\u3002\u91cd\u8907\u8cfc\u5165\u3092\u9632\u3050\u305f\u3081\u3001\u518d\u8cfc\u5165\u305b\u305a\u3054\u78ba\u8a8d\u304f\u3060\u3055\u3044\u3002"
       );
       return;
     }
 
     const button = document.getElementById("payButton");
-    const originalText = button.textContent;
 
+    destinyCheckoutBusy = true;
     button.disabled = true;
-    let orderRequestStarted = false;
 
     try {
-      button.textContent = "決済の準備中...";
+      button.textContent = "PayPal Sandbox...";
 
-      await ensurePaddleReady();
+      const approvalUrl = await destinyCreatePayPalOrder();
 
-      const apiBase = destinyRequireApi();
-      orderRequestStarted = true;
-
-      const response = await fetch(
-        apiBase + "/paddle/order",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            category: PRODUCT_CODE,
-            name: (
-              document.getElementById("customerName")?.value || ""
-            ).trim().slice(0, 20),
-            birth: window.destinyBirthInput
-          })
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Order creation HTTP error");
+      if (!approvalUrl) {
+        button.disabled = false;
+        button.textContent = "\u79c1\u306e\u604b\u611b\u306e\u7d9a\u304d\u3092\u8aad\u3080";
+        return;
       }
 
-      const checkout = await response.json();
-
-      if (
-        !checkout.ok ||
-        !checkout.order_id ||
-        !checkout.progress_token
-      ) {
-        throw new Error("Order authorization failed");
-      }
-
-      destinyCurrentOrderId = checkout.order_id;
-      destinyCurrentProgressToken = checkout.progress_token;
-      destinyCheckoutCompleted = false;
-
-      destinyPaymentMessage(
-        "決済画面を開いています。お支払い後、注文状況をご案内します。"
-      );
-
-      Paddle.Checkout.open({
-          settings: {
-            locale: "ja"
-          },
-        items: [{
-          priceId: window.destinyPaddleConfig.love_price_id,
-          quantity: 1
-        }],
-        customData: {
-          order_id: checkout.order_id
-        }
-      });
-
-      button.textContent = "注文状況を確認中";
-
-      /*
-       * Payment confirmation comes only from the server.
-       * Paddle checkout events are not proof of payment.
-       */
-      await destinyTrackOrder();
+      window.location.assign(approvalUrl);
 
     } catch (error) {
-      console.error("Payment flow error:", error);
+      console.error("PayPal checkout error:", error);
 
-      if (destinyCurrentOrderId) {
-        destinyPaymentMessage(
-          "注文状況を確認できません。決済済みの可能性があるため、再購入せずサポートへお問い合わせください。"
-        );
-        button.textContent = "注文状況の確認が必要です";
-      } else if (orderRequestStarted) {
-        destinyPaymentMessage(
-          "\u6ce8\u6587\u4f5c\u6210\u306e\u7d50\u679c\u3092\u78ba\u8a8d\u3067\u304d\u307e\u305b\u3093\u3002\u91cd\u8907\u6c7a\u6e08\u3092\u9632\u3050\u305f\u3081\u3001\u518d\u8cfc\u5165\u305b\u305a\u30b5\u30dd\u30fc\u30c8\u3078\u304a\u554f\u3044\u5408\u308f\u305b\u304f\u3060\u3055\u3044\u3002"
-        );
-        button.textContent = "\u6ce8\u6587\u72b6\u6cc1\u306e\u78ba\u8a8d\u304c\u5fc5\u8981\u3067\u3059";
-      } else {
-        destinyPaymentMessage(
-          "決済を開始できませんでした。しばらくしてからお試しください。"
-        );
-        button.disabled = false;
-        button.textContent = originalText;
-      }
+      destinyPaymentMessage(
+        "\u6c7a\u6e08\u6e96\u5099\u306e\u7d50\u679c\u3092\u78ba\u8a8d\u3067\u304d\u307e\u305b\u3093\u3002\u518d\u8cfc\u5165\u305b\u305a\u30b5\u30dd\u30fc\u30c8\u3078\u304a\u554f\u3044\u5408\u308f\u305b\u304f\u3060\u3055\u3044\u3002"
+      );
+
+      button.textContent = "????????????";
+
+    } finally {
+      destinyCheckoutBusy = false;
     }
   }
+);
+
+document.addEventListener(
+  "DOMContentLoaded",
+  destinyHandlePayPalReturn
 );
 
 </script>
@@ -2571,89 +2635,6 @@ document.getElementById("payButton").addEventListener(
 })();
 </script>
 
-
-<!-- DESTINY CODE LEGAL FOOTER START -->
-<style>
-.destiny-legal-footer {
-  padding: 35px 20px 45px;
-  text-align: center;
-  border-top: 1px solid rgba(216,182,107,.24);
-  background: #0b1022;
-  font-family: "Noto Serif JP", "Yu Mincho", serif;
-}
-
-.destiny-legal-footer nav {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 12px 25px;
-  max-width: 900px;
-  margin: 0 auto;
-}
-
-.destiny-legal-footer a {
-  color: #d8b66b;
-  font-size: 12px;
-  line-height: 1.8;
-  text-decoration: none;
-  transition: opacity .2s ease;
-}
-
-.destiny-legal-footer a:hover {
-  opacity: .7;
-}
-
-.destiny-legal-footer .copyright {
-  margin-top: 25px;
-  color: #abb2c5;
-  font-size: 11px;
-  letter-spacing: .15em;
-}
-
-@media (max-width:600px) {
-  .destiny-legal-footer {
-    padding: 30px 15px 40px;
-  }
-
-  .destiny-legal-footer nav {
-    gap: 10px 18px;
-  }
-
-  .destiny-legal-footer a {
-    font-size: 11px;
-  }
-}
-</style>
-
-<footer class="destiny-legal-footer">
-  <nav aria-label="Legal information">
-    <a href="index.html">HOME</a>
-    <a href="legal.html">特定商取引法に基づく表記</a>
-    <a href="privacy.html">プライバシーポリシー</a>
-    <a href="refund.html">返金・キャンセルポリシー</a>
-    <a href="mailto:dabindas18@gmail.com">お問い合わせ</a>
-  </nav>
-
-  <div class="copyright">
-    © DESTINY CODE
-  </div>
-</footer>
-<!-- DESTINY CODE LEGAL FOOTER END -->
-
-
-<script>
-/* DESTINY CODE PAYMENT UI LOCK */
-document.addEventListener("DOMContentLoaded", function() {
-  const button = document.getElementById("payButton");
-  if (!button) return;
-
-  button.disabled = true;
-  button.textContent = "決済準備中";
-  button.setAttribute("aria-disabled", "true");
-  button.style.opacity = "0.55";
-  button.style.cursor = "not-allowed";
-});
-</script>
 </body>
 </html>
 
