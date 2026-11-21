@@ -1146,6 +1146,24 @@ strong { color: #edcb7b; font-size: 2rem; }
           body: JSON.stringify({request_key: reqKey, token: token})
         });
         const data = await res.json();
+        if (data.error === "failed_before_paypal") {
+          if (localStorage.getItem(keyName) !== reqKey) {
+            status.textContent = MSG.fail;
+            return;
+          }
+          let saved = null;
+          try { saved = JSON.parse(localStorage.getItem(ATT) || "null"); } catch (_) {}
+          if (saved && saved.key === reqKey) localStorage.removeItem(ATT);
+
+          reqKey = makeKey();
+          localStorage.setItem(keyName, reqKey);
+          cta.disabled = false;
+          status.textContent = "";
+          if (confirm("\u4e00\u6642\u7684\u306b\u6c7a\u6e08\u753b\u9762\u3092\u958b\u3051\u307e\u305b\u3093\u3067\u3057\u305f\u3002\n\u3082\u3046\u4e00\u5ea6\u958b\u304d\u307e\u3059\u304b\uff1f")) {
+            setTimeout(() => cta.click(), 0);
+          }
+          return;
+        }
         if (!res.ok || !data.ok || typeof data.approval_url !== "string" ||
             !data.approval_url.startsWith("https://www.sandbox.paypal.com/")) {
           throw new Error("checkout not created");
