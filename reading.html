@@ -1423,7 +1423,7 @@ const CONFIG = {
     kicker:"NEW YEAR FORTUNE",
     title:"新年運勢",
     intro:"あなたの命式と年運を重ね、今年の流れを読み解きます。",
-    button:"近日公開",
+    button:"無料で新年運勢を読み解く",
     analysis:"今年の年運を確認しています",
     result:"新年運勢",
     image:"images/theme/life-cycle.png",
@@ -1478,7 +1478,7 @@ const DESTINY_LOCAL =
 const DESTINY = {
   apiBase:
     window.DESTINY_API_BASE ||
-    (DESTINY_LOCAL ? "http://127.0.0.1:8770" : "https://enclosed-cooked-towns-deal.trycloudflare.com")
+    (DESTINY_LOCAL ? "http://127.0.0.1:8770" : "")
 };
 
 const DESTINY_PAYPAL = {
@@ -1486,7 +1486,7 @@ const DESTINY_PAYPAL = {
     window.DESTINY_PAYPAL_API_BASE ||
     (DESTINY_LOCAL
       ? "http://127.0.0.1:8771"
-      : "https://activities-successfully-genome-consequence.trycloudflare.com")
+      : "")
 };
 
 function destinyRequirePayPalApi() {
@@ -1548,7 +1548,7 @@ const LAYOUT_BY_PRODUCT = {
 };
 
 const SALEABLE_PRODUCTS = {
-  love:true
+  love:true, money:true, business:true, career:true, year2027:true, full:true
 };
 
 const PRODUCT_PRICES = {
@@ -1898,12 +1898,9 @@ function runAnalysis(){
 /* REAL CALCULATION API */
 
 async function calculateSaju(payload) {
-  if (PRODUCT_CODE !== "love") {
-    throw new Error("Preview not available for this product");
-  }
 
   const response = await fetch(
-    destinyRequireApi() + "/preview/love",
+    "/preview/" + PRODUCT_CODE,
     {
       method: "POST",
       headers: {
@@ -1923,7 +1920,7 @@ async function calculateSaju(payload) {
 
   if (
     !data.ok ||
-    data.product_code !== "love" ||
+    data.product_code !== PRODUCT_CODE ||
     !data.calculation ||
     !data.calculation.day_master ||
     !data.calculation.five_elements
@@ -1931,7 +1928,7 @@ async function calculateSaju(payload) {
     throw new Error("Invalid preview response");
   }
 
-  return data.calculation;
+  return Object.assign({}, data.calculation, { localPreviewText: data.preview });
 }
 
 
@@ -1980,8 +1977,7 @@ function applyCalculation(
   const major =
     data.current_major_luck;
 
-  let majorText =
-    "該当なし";
+  let majorText = data.birth_time_unknown ? "出生時間不明のため非表示" : "該当なし";
 
   if(major){
 
@@ -2099,7 +2095,7 @@ function showResult(){
       h2.textContent =
         "日主は「" +
         dm +
-        "」。五行の配置と現在の大運も算出されています。";
+        "」。五行の配置を確認しました。" + (calc.current_major_luck ? "現在の大運も算出されています。" : "");
     }
 
     if (h3) {
@@ -2112,6 +2108,24 @@ function showResult(){
       h4.textContent =
         "ここから先は完全版でご覧いただけます。";
     }
+
+    // LOCAL_LOVE_PREVIEW: reuse the existing server preview.
+    if (
+
+      typeof calc.localPreviewText === "string" &&
+      calc.localPreviewText.trim()
+    ) {
+      if (h1) h1.textContent = C.title;
+
+      if (h2) h2.textContent = calc.localPreviewText.trim();
+      if (PRODUCT_CODE !== "love" && window.applyLocalStoryVariant) {
+        window.applyLocalStoryVariant(PRODUCT_CODE, calc);
+      }
+
+      if (h3) h3.textContent = "";
+      if (h4) h4.textContent = "";
+    }
+
 
     const payButton =
       document.getElementById(
@@ -2139,11 +2153,6 @@ document.getElementById(
   async function(e){
 
     e.preventDefault();
-
-    if (PRODUCT_CODE !== "love") {
-      alert("この商品の無料鑑定は近日公開予定です。");
-      return;
-    }
 
     const y =
       document.getElementById(
@@ -2374,9 +2383,76 @@ function destinyAskCustomerEmail() {
   return cleaned;
 }
 
+let destinyLoveConfirmedStartYear = null;
+let destinyLoveServerStartYear = null;
+
+function destinyLoveJstStartYear() {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Asia/Tokyo",
+    year: "numeric",
+    month: "numeric"
+  }).formatToParts(new Date());
+
+  const year = Number(parts.find(p => p.type === "year").value);
+  const month = Number(parts.find(p => p.type === "month").value);
+  if (!Number.isInteger(year) || month < 1 || month > 12) {
+    throw new Error("Cannot determine forecast period");
+  }
+  return year + (month >= 9 ? 1 : 0);
+}
+
+function destinyLoveShowPeriod(startYear) {
+  const section = document.getElementById("fullReadingResult");
+  if (!section) throw new Error("Payment section not found");
+
+  let box = document.getElementById("destinyLovePeriodConfirm");
+  if (!box) {
+    box = document.createElement("div");
+    box.id = "destinyLovePeriodConfirm";
+    box.style.cssText = "margin:16px 0;padding:14px;border:1px solid #c8a75d;border-radius:8px";
+
+    const period = document.createElement("p");
+    period.id = "destinyLovePeriodText";
+    box.appendChild(period);
+
+    const label = document.createElement("label");
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.id = "destinyLovePeriodCheckbox";
+    label.appendChild(checkbox);
+    label.appendChild(document.createTextNode(
+      " \u4e0a\u8a18\u306e\u9451\u5b9a\u671f\u9593\u3092\u78ba\u8a8d\u3057\u307e\u3057\u305f"
+    ));
+    box.appendChild(label);
+    section.prepend(box);
+  }
+
+  document.getElementById("destinyLovePeriodText").textContent =
+    "\u672a\u6765\u9451\u5b9a\u671f\u9593: " +
+    startYear + "\u5e74\u301c" + (startYear + 2) + "\u5e74";
+  document.getElementById("destinyLovePeriodCheckbox").checked = false;
+  destinyLoveConfirmedStartYear = startYear;
+  box.scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
 async function destinyCreatePayPalOrder() {
   if (!DESTINY_PAYPAL_TEST_ENABLED) {
     throw new Error("PayPal Sandbox checkout disabled");
+  }
+
+  const currentYear = destinyLoveServerStartYear !== null
+    ? destinyLoveServerStartYear
+    : destinyLoveJstStartYear();
+  const checkbox = document.getElementById("destinyLovePeriodCheckbox");
+
+  if (destinyLoveConfirmedStartYear !== currentYear || !checkbox) {
+    destinyLoveShowPeriod(currentYear);
+    return null;
+  }
+  if (!checkbox.checked) {
+    document.getElementById("destinyLovePeriodConfirm")
+      .scrollIntoView({ behavior: "smooth", block: "center" });
+    return null;
   }
 
   const email = destinyAskCustomerEmail();
@@ -2396,10 +2472,27 @@ async function destinyCreatePayPalOrder() {
       body: JSON.stringify({
         customer_name: name,
         customer_email: email,
-        birth: window.destinyBirthInput
+        birth: window.destinyBirthInput,
+        expected_start_year: destinyLoveConfirmedStartYear
       })
     }
   );
+
+  if (response.status === 409) {
+    const changed = await response.json();
+    if (
+      changed.error !== "forecast_period_changed" ||
+      !Number.isInteger(changed.start_year)
+    ) {
+      throw new Error("Invalid period change response");
+    }
+    destinyLoveServerStartYear = changed.start_year;
+    destinyLoveShowPeriod(changed.start_year);
+    destinyPaymentMessage(
+      "\u9451\u5b9a\u671f\u9593\u304c\u5909\u308f\u308a\u307e\u3057\u305f\u3002\u671f\u9593\u3092\u518d\u5ea6\u3054\u78ba\u8a8d\u304f\u3060\u3055\u3044\u3002"
+    );
+    return null;
+  }
 
   if (!response.ok) {
     throw new Error("PayPal order creation failed");
@@ -2634,6 +2727,697 @@ document.addEventListener(
   document.addEventListener("DOMContentLoaded",syncBirthPlace);
 })();
 </script>
+
+
+
+<!-- LOCAL_YEAR_IMAGE_SIZE_FIX -->
+<style>
+  .theme-image.local-year-image {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 5 / 3;
+    max-height: 430px;
+    object-fit: cover;
+    object-position: center 35%;
+    background: #080e1d;
+  }
+</style>
+<script>
+  if (PRODUCT_CODE === "year2027") {
+    const yearImage = document.getElementById("themeImage");
+    if (yearImage) {
+      yearImage.classList.add("local-year-image");
+      yearImage.src = "images/theme/life-cycle2.png";
+    }
+  }
+</script>
+
+
+
+
+
+<script id="local-product-fade-and-intro">
+document.addEventListener("DOMContentLoaded", function () {
+  if (typeof PRODUCT_CODE === "undefined" || PRODUCT_CODE === "love") return;
+
+  const copy = {
+    business: {
+      story: [
+        "そして、ここでもうひとつ。",
+        "事業では、得意なことがそのまま強みになるとは限りません。",
+        "同じ持ち味でも、誰に、どのように届けるかで、その生かされ方は変わります。",
+        "あなたの持ち味を生かすとき、特に見ておきたいのは――",
+        "次の一歩を考えるうえで、見落としやすいポイントは……"
+      ],
+      intro: "事業を進めるときの持ち味や、独立に向けて考えたいテーマ。あなたの命式から読み解きます。",
+      button: "私の事業運の続きを読む"
+    },
+    career: {
+      story: [
+        "そして、ここでもうひとつ。",
+        "仕事では、得意なことと、周囲から求められる役割がいつも同じとは限りません。",
+        "働く環境や任される仕事によって、同じ持ち味の現れ方も変わってきます。",
+        "あなたらしさを生かす働き方を考えるとき、注目したいのは――",
+        "次の選択で、見落としやすいポイントは……"
+      ],
+      intro: "仕事で生かしやすい持ち味や、働き方を考えるヒント。あなたの命式から読み解きます。",
+      button: "私の仕事運の続きを読む"
+    },
+    money: {
+      story: [
+        "そして、ここでもうひとつ。",
+        "お金の流れは、増やすことだけでなく、何に使い、何を残すかにも表れます。",
+        "同じ選択でも、自分に合う形と無理を重ねてしまう形では、その後の感じ方が変わります。",
+        "あなたのお金との付き合い方を考えるとき、注目したいのは――",
+        "日々の選択で、見落としやすいポイントは……"
+      ],
+      intro: "お金との向き合い方や、収入と支出を考えるヒント。あなたの命式から読み解きます。",
+      button: "私の金運の続きを読む"
+    },
+    year2027: {
+      story: [
+        "そして、ここでもうひとつ。",
+        "一年のテーマは、ただ待っているだけで同じ形に現れるとは限りません。",
+        "生まれ持った傾向と、その年の巡りを重ねることで、意識したいことが見えてきます。",
+        "2027年を自分らしく過ごすために、特に注目したいのは――",
+        "その流れの中で、見落としやすいポイントは……"
+      ],
+      intro: "2027年の巡りと、その年に意識したいテーマ。あなたの命式と年の流れを重ねて読み解きます。",
+      button: "私の2027年の続きを読む"
+    },
+    full: {
+      story: [
+        "そして、ここでもうひとつ。",
+        "生まれ持った傾向は、人生のすべてを決めてしまうものではありません。",
+        "同じ持ち味でも、置かれた環境や選択によって、違う形で生かされていきます。",
+        "これまでの歩みと、これからを重ねて見るとき、注目したいのは――",
+        "人生の流れを考えるうえで、見落としやすいポイントは……"
+      ],
+      intro: "生まれ持った傾向と、人生の歩みを考えるヒント。あなたの命式から読み解きます。",
+      button: "私の人生鑑定の続きを読む"
+    }
+  };
+
+  const item = copy[PRODUCT_CODE];
+  if (!item) return;
+
+  const story = document.querySelector(".story-open-loop p");
+  const intro = document.querySelector(".payment-emotion .value");
+  const button = document.getElementById("payButton");
+
+  if (story) {
+    story.textContent = item.story.join("\n\n");
+    story.style.whiteSpace = "pre-line";
+  }
+  if (intro) intro.textContent = item.intro;
+
+  // Respect the existing product availability gate.
+  if (button && typeof PRODUCT_SALEABLE !== "undefined" && PRODUCT_SALEABLE) {
+    button.textContent = item.button;
+  }
+});
+</script>
+
+
+<script id="local-five-story-variants">
+(function () {
+  const variants = {
+    business: [
+      [
+        "事業では、得意なことがそのまま強みになるとは限りません。",
+        "誰に、どのように届けるかで、同じ持ち味の生かされ方も変わります。",
+        "あなたらしい事業の形を考えるとき、注目したいのは――"
+      ],
+      [
+        "新しいことを始めるとき、勢いだけでは見えないものがあります。",
+        "自分の持ち味と、無理なく続けられる方法を重ねることも大切です。",
+        "次の一歩を選ぶ前に、見ておきたいのは――"
+      ],
+      [
+        "事業の可能性は、一人で考えているときと、人に届けるときで違って見えます。",
+        "大切にしたい価値を、相手に伝わる形にすることが鍵になります。",
+        "その持ち味を生かすうえで、考えたいのは――"
+      ],
+      [
+        "大きく動くことだけが、事業を進める方法ではありません。",
+        "積み重ねることと、変えていくことのバランスも大切です。",
+        "あなたが進む方向を考えるとき、注目したいのは――"
+      ],
+      [
+        "自分に合う事業の形は、周囲の成功例と同じとは限りません。",
+        "得意なことを続けられる環境にも目を向けてみましょう。",
+        "その先の選択で、見落としたくないのは――"
+      ]
+    ],
+    career: [
+      [
+        "仕事では、得意なことと周囲から求められる役割がいつも同じとは限りません。",
+        "環境や任される仕事によって、同じ持ち味の現れ方も変わります。",
+        "あなたらしい働き方を考えるとき、注目したいのは――"
+      ],
+      [
+        "頑張り方を変えなくても、場所や役割が変わると見える景色は変わります。",
+        "自分の持ち味が自然に生きる場面を振り返ってみましょう。",
+        "次の選択を考えるうえで、大切なのは――"
+      ],
+      [
+        "仕事の強みは、目立つ成果だけに表れるとは限りません。",
+        "普段何気なくしていることが、周囲を支える力になる場合もあります。",
+        "その持ち味を生かすために、見ておきたいのは――"
+      ],
+      [
+        "変化したい気持ちと、今の安定を大切にしたい気持ち。",
+        "どちらか一方だけを選ぶ前に、自分に合う働き方を考える余地があります。",
+        "そのバランスを見つけるとき、注目したいのは――"
+      ],
+      [
+        "向いている仕事を考えるとき、仕事内容だけが答えではありません。",
+        "人との関わり方や、自分のペースを保てる環境も大切です。",
+        "これからの働き方を考えるとき、見落としたくないのは――"
+      ]
+    ],
+    money: [
+      [
+        "お金の流れは、増やすことだけでなく、何に使い、何を残すかにも表れます。",
+        "自分に合う選択と無理を重ねる選択では、その後の感じ方も変わります。",
+        "あなたのお金との付き合い方を考えるとき、注目したいのは――"
+      ],
+      [
+        "お金を使う場面には、自分が大切にしているものが表れます。",
+        "貯めることと楽しむこと、どちらにも自分に合うペースがあります。",
+        "そのバランスを考えるとき、見ておきたいのは――"
+      ],
+      [
+        "収入だけを見ていては、お金との関係がすべて見えるわけではありません。",
+        "日々の選択や、安心を感じる使い方にも目を向けてみましょう。",
+        "あなたに合う整え方を考えるうえで、大切なのは――"
+      ],
+      [
+        "将来に備える気持ちと、今を楽しみたい気持ちは両立できます。",
+        "大切にしたいものを知ることが、お金の選択の手がかりになります。",
+        "その中で、見落としたくないポイントは――"
+      ],
+      [
+        "同じ金額でも、使い方によって得られる満足感は変わります。",
+        "自分の持ち味と暮らしの優先順位を重ねて考えてみましょう。",
+        "これからのお金との関係で、注目したいのは――"
+      ]
+    ],
+    year2027: [
+      [
+        "一年のテーマは、誰にでも同じ形で現れるとは限りません。",
+        "生まれ持った傾向と年の巡りを重ねることで、意識したいことが見えてきます。",
+        "2027年を自分らしく過ごすために、注目したいのは――"
+      ],
+      [
+        "新しい一年は、何かを始めるだけでなく、今あるものを見直す時間にもなります。",
+        "年の巡りを、自分の持ち味とどう重ねるかが一つの手がかりです。",
+        "2027年の選択を考えるとき、見ておきたいのは――"
+      ],
+      [
+        "同じ年の巡りでも、何を大切にするかによって受け止め方は変わります。",
+        "まずは自分のペースと、年のテーマの両方に目を向けてみましょう。",
+        "その中で、特に意識したいポイントは――"
+      ],
+      [
+        "一年を通して、動く時間と整える時間の両方があります。",
+        "生まれ持った傾向を知ると、巡りとの向き合い方を考えやすくなります。",
+        "2027年を迎えるうえで、見落としたくないのは――"
+      ],
+      [
+        "年のテーマは、結果を決めるものではなく、選択を考えるためのヒントです。",
+        "自分が大切にしたいことと、2027年の巡りを重ねてみましょう。",
+        "その先で注目したい流れは――"
+      ]
+    ],
+    full: [
+      [
+        "生まれ持った傾向は、人生のすべてを決めてしまうものではありません。",
+        "同じ持ち味でも、環境や選択によって違う形で生かされていきます。",
+        "これまでの歩みと、これからを重ねて見るとき、注目したいのは――"
+      ],
+      [
+        "自分では当たり前だと思っていたことが、持ち味として表れる場合があります。",
+        "これまでの選択を振り返ると、大切にしてきたものが見えてきます。",
+        "これからの歩みを考えるうえで、見ておきたいのは――"
+      ],
+      [
+        "人生の流れは、一つの出来事だけで決まるものではありません。",
+        "自分の傾向を知ることは、次の選択を考える手がかりになります。",
+        "その持ち味を生かすとき、注目したいのは――"
+      ],
+      [
+        "過去の経験と、これから大切にしたいことは、必ずしも同じではありません。",
+        "変わらず持っているものと、これから育てたいものを重ねてみましょう。",
+        "あなたらしい歩みを考えるとき、大切なのは――"
+      ],
+      [
+        "人にはそれぞれ、自分のペースで力を生かす場面があります。",
+        "持ち味を知ることは、過去を理解し、未来の選択を考える一つの手がかりです。",
+        "これからを見つめるうえで、見落としたくないのは――"
+      ]
+    ]
+  };
+
+  const stems = ["甲","乙","丙","丁","戊","己","庚","辛","壬","癸"];
+
+  window.applyLocalStoryVariant = function (product, calc) {
+    const stem = calc && calc.day_master &&
+                 calc.day_master.stem && calc.day_master.stem.hanja;
+    const index = stems.indexOf(stem);
+    const choices = variants[product];
+    const target = document.querySelector(".story-open-loop p");
+
+    if (index < 0 || !choices || choices.length !== 5 || !target) return;
+
+    const story = choices[index % 5];
+    target.textContent = [
+      "そして、ここでもうひとつ。",
+      story[0],
+      story[1],
+      story[2],
+      "その先にある、見落としやすいポイントは……"
+    ].join("\n\n");
+    target.style.whiteSpace = "pre-line";
+  };
+})();
+</script>
+
+<!-- LOCAL-8811-PREMIUM-COMPLETION-START -->
+<script>
+(function () {
+  if (new URLSearchParams(location.search).get("paypal_return") !== "1") return;
+  document.documentElement.classList.add("local-premium-completion");
+})();
+</script>
+<style>
+html.local-premium-completion {
+  min-height: 100%;
+  background: #080e1c;
+}
+html.local-premium-completion body {
+  min-height: 100vh;
+  margin: 0;
+  background:
+    radial-gradient(ellipse at 50% 12%, rgba(43, 58, 92, .44), transparent 55%),
+    linear-gradient(155deg, #0c1426 0%, #080e1c 65%, #060b16 100%) !important;
+}
+html.local-premium-completion #fullReadingResult {
+  box-sizing: border-box !important;
+  width: calc(100% - 36px) !important;
+  max-width: 680px !important;
+  margin: clamp(70px, 14vh, 150px) auto 50px !important;
+  padding: clamp(34px, 6vw, 62px) clamp(25px, 6vw, 60px) !important;
+  border: 1px solid rgba(203, 171, 102, .48) !important;
+  border-radius: 4px !important;
+  background: linear-gradient(145deg, rgba(21, 32, 55, .98), rgba(12, 21, 39, .98)) !important;
+  box-shadow: 0 24px 65px rgba(0, 0, 0, .34), inset 0 1px rgba(255, 235, 186, .06) !important;
+  color: #f3f0e9 !important;
+  text-align: center !important;
+}
+html.local-premium-completion #fullReadingResult::before {
+  content: "\2727";
+  display: block;
+  margin: 0 auto 23px;
+  color: #d8bc7a;
+  font-size: 32px;
+  line-height: 1;
+}
+html.local-premium-completion #fullReadingResult h1,
+html.local-premium-completion #fullReadingResult h2,
+html.local-premium-completion #fullReadingResult h3 {
+  color: #f8f3e7 !important;
+  letter-spacing: .08em;
+  line-height: 1.6;
+  margin: 18px 0 24px !important;
+}
+html.local-premium-completion #fullReadingBody {
+  margin: 0 auto;
+  padding: 24px 0;
+  border-top: 1px solid rgba(203, 171, 102, .27);
+  border-bottom: 1px solid rgba(203, 171, 102, .27);
+  line-height: 2;
+}
+html.local-premium-completion #fullReadingBody p {
+  margin: 0 !important;
+  color: #eee9df !important;
+  font-size: clamp(14px, 1.5vw, 16px) !important;
+  line-height: 2 !important;
+  letter-spacing: .03em;
+}
+html.local-premium-completion #fullReadingResult small {
+  display: block;
+  margin-top: 26px;
+  color: #a8b0be !important;
+  line-height: 1.8;
+}
+</style>
+<!-- LOCAL-8811-PREMIUM-COMPLETION-END -->
+
+<!-- LOCAL-8812-HOME-LINK -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  if (new URLSearchParams(location.search).get("paypal_return") !== "1") return;
+  const section = document.getElementById("fullReadingResult");
+  if (!section || document.getElementById("localCompletionHome")) return;
+
+  const link = document.createElement("a");
+  link.id = "localCompletionHome";
+  link.href = "/";
+  link.textContent = "\u30db\u30fc\u30e0\u30da\u30fc\u30b8\u306e\u6700\u521d\u306b\u623b\u308b";
+  link.style.cssText =
+    "display:inline-block;margin-top:28px;padding:12px 24px;" +
+    "border:1px solid rgba(203,171,102,.65);border-radius:3px;" +
+    "color:#e5cf96;text-decoration:none;letter-spacing:.05em;font-size:13px;";
+  section.appendChild(link);
+});
+</script>
+
+
+<!-- DESTINY_SANDBOX_INJECTION_STAGE_V1 -->
+
+<script>
+document.addEventListener("DOMContentLoaded", async function () {
+  const params = new URLSearchParams(location.search);
+  const keyName = "destiny_local_sandbox_8813_" + PRODUCT_CODE;
+  const completedKeyName = keyName + "_completed";
+
+  if (params.get("paypal_return") === "1") {
+    const section = document.getElementById("fullReadingResult");
+    if (!section) return;
+    // Reuse the existing site header on the payment return screen.
+    const originalHeader = document.querySelector(".shell > header");
+    let completionHeader = null;
+    if (originalHeader) {
+      completionHeader = document.createElement("div");
+      completionHeader.className = "shell";
+      completionHeader.appendChild(originalHeader.cloneNode(true));
+      document.body.appendChild(completionHeader);
+    }
+
+    document.body.appendChild(section);
+    for (const child of Array.from(document.body.children)) {
+      if (child !== section && child !== completionHeader && child.tagName !== "SCRIPT") {
+        child.style.display = "none";
+      }
+    }
+    section.style.display = "block";
+
+    destinyPaymentMessage(
+      "PayPal\u306e\u304a\u652f\u6255\u3044\u72b6\u6cc1\u3092\u78ba\u8a8d\u3057\u3066\u3044\u307e\u3059\u3002"
+    );
+
+    try {
+      const key = localStorage.getItem(keyName);
+      const token = params.get("token");
+      if (!key || !token) throw new Error("missing return data");
+
+      const response = await fetch("/local-flow/confirm", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({request_key: key, paypal_token: token})
+      });
+      const data = await response.json();
+      if (!response.ok || !data.ok || data.status !== "paid") {
+        throw new Error("payment not confirmed");
+      }
+
+      // Mark only the request that the server confirmed as paid.
+      // Keep its key for a return-page reload.
+      if (localStorage.getItem(keyName) === key) {
+        localStorage.setItem(completedKeyName, key);
+      }
+
+      destinyPaymentMessage(
+        "\u304a\u652f\u6255\u3044\u3092\u78ba\u8a8d\u3057\u307e\u3057\u305f\u3002\u9451\u5b9a\u66f8\u3092\u4f5c\u6210\u3057\u3001\u30e1\u30fc\u30eb\u3067\u304a\u5c4a\u3051\u3057\u307e\u3059\u3002"
+      );
+      // MARKETING_CONSENT_UI_V1
+      {
+        const box = document.createElement("div");
+        box.style.cssText = "margin:24px auto;max-width:520px;padding:16px;text-align:center;box-sizing:border-box;";
+        const label = document.createElement("label");
+        const check = document.createElement("input");
+        check.type = "checkbox";
+        check.checked = false;
+        label.style.cssText = "display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;";
+        check.style.cssText = "position:static;display:inline-block;width:18px;height:18px;min-width:18px;margin:0;padding:0;flex:0 0 auto;";
+        label.append(document.createTextNode(
+          "\uff1c\u4efb\u610f\uff1e\u304a\u5f97\u306a\u5272\u5f15\u60c5\u5831\u3092\u30e1\u30fc\u30eb\u3067\u53d7\u3051\u53d6\u308b"
+        ), check);
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = "\u30e1\u30fc\u30eb\u3067\u53d7\u3051\u53d6\u308b";
+        button.style.cssText = "display:block;margin:12px auto 0;padding:10px 20px;background:#c6aa70;color:#17151b;border:0;border-radius:4px;cursor:pointer;";
+        const message = document.createElement("p");
+        message.setAttribute("role", "status");
+        button.addEventListener("click", async () => {
+          if (!check.checked) return;
+          button.disabled = true;
+          try {
+            const response = await fetch("/local-flow/marketing-consent", {
+              method: "POST",
+              headers: {"Content-Type": "application/json"},
+              body: JSON.stringify({request_key: key, paypal_token: token})
+            });
+            const result = await response.json();
+            if (!response.ok || !result.ok) throw new Error("consent failed");
+            message.textContent = result.created === true
+              ? "\u304a\u7533\u3057\u8fbc\u307f\u3042\u308a\u304c\u3068\u3046\u3054\u3056\u3044\u307e\u3059"
+              : "\u3053\u306e\u7533\u3057\u8fbc\u307f\u306f\u51e6\u7406\u6e08\u307f\u3067\u3059\u3002\u73fe\u5728\u306e\u914d\u4fe1\u8a2d\u5b9a\u306f\u5909\u66f4\u3055\u308c\u307e\u305b\u3093\u3002";
+          } catch (_) {
+            message.textContent = "\u767b\u9332\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f\u3002\u304a\u652f\u6255\u3044\u306b\u5f71\u97ff\u306f\u3042\u308a\u307e\u305b\u3093\u3002";
+            button.disabled = false;
+          }
+        });
+        const note = document.createElement("p");
+        note.textContent = "\u304a\u7533\u3057\u8fbc\u307f\u306f\u4efb\u610f\u3067\u3059\u3002\u30c1\u30a7\u30c3\u30af\u3057\u306a\u3051\u308c\u3070\u767b\u9332\u3055\u308c\u307e\u305b\u3093\u3002\u914d\u4fe1\u306f\u3044\u3064\u3067\u3082\u505c\u6b62\u3067\u304d\u307e\u3059\u3002";
+        box.append(label, button, message);
+        const confirmation = Array.from(document.querySelectorAll("p, div"))
+          .find(el => el.children.length === 0 &&
+            el.textContent.trim() === "\u304a\u652f\u6255\u3044\u3092\u78ba\u8a8d\u3057\u307e\u3057\u305f\u3002\u9451\u5b9a\u66f8\u3092\u4f5c\u6210\u3057\u3001\u30e1\u30fc\u30eb\u3067\u304a\u5c4a\u3051\u3057\u307e\u3059\u3002");
+        if (confirmation) confirmation.insertAdjacentElement("afterend", box);
+        else document.body.appendChild(box);
+      }
+
+    } catch (_) {
+      destinyPaymentMessage(
+        "\u6c7a\u6e08\u72b6\u6cc1\u3092\u78ba\u8a8d\u3067\u304d\u307e\u305b\u3093\u3002\u518d\u8cfc\u5165\u305b\u305a\u30b5\u30dd\u30fc\u30c8\u3078\u304a\u554f\u3044\u5408\u308f\u305b\u304f\u3060\u3055\u3044\u3002"
+      );
+    }
+    return;
+  }
+
+  if (params.get("paypal_cancel") === "1") {
+    destinyPaymentMessage(
+      "\u6c7a\u6e08\u306f\u30ad\u30e3\u30f3\u30bb\u30eb\u3055\u308c\u307e\u3057\u305f\u3002\u6ce8\u6587\u72b6\u6cc1\u3092\u78ba\u8a8d\u3057\u3066\u304f\u3060\u3055\u3044\u3002"
+    );
+    return;
+  }
+
+  if (typeof PRODUCT_CODE === "undefined" ||
+      !["love", "business", "career", "money", "year2027", "full"]
+        .includes(PRODUCT_CODE)) return;
+
+  const box = document.createElement("div");
+  box.style.cssText = "padding:16px;background:#fff4cf;color:#222;text-align:center;position:relative;z-index:10";
+
+  const note = document.createElement("p");
+  note.textContent = "LOCAL SANDBOX: PayPal test / no PDF / no email";
+  const button = document.createElement("button");
+  button.type = "button";
+  button.textContent = "PayPal Sandbox \u8a66\u9a13\u6c7a\u6e08";
+  const status = document.createElement("p");
+  box.append(note, button, status);
+
+  // 시험 띠 대신 기존 금색 버튼을 사용합니다.
+  box.style.display = "none";
+  document.body.appendChild(box);
+
+  const existingButton = document.getElementById("payButton");
+  if (!existingButton) {
+    console.error("Local Sandbox payment button not found");
+    return;
+  }
+
+  // 상태 메시지는 기존 버튼 근처에 표시합니다.
+  status.style.cssText = "margin:12px 0;color:#d8c490;text-align:center";
+  existingButton.insertAdjacentElement("afterend", status);
+
+  // 현재 로컬 시험에서는 기존의 '준비 중' 안내를 숨깁니다.
+  document.querySelectorAll(".payment-note").forEach(function (note) {
+    note.style.display = "none";
+  });
+
+  // 캡처 단계에서 기존 LOVE 전용 클릭 처리를 막고,
+  // 이미 준비된 6상품 Sandbox 연결을 사용합니다.
+  document.addEventListener("click", function (event) {
+    if (!existingButton.contains(event.target)) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    button.click();
+  }, true);
+
+
+  let purchaseClickInFlight = false;
+  button.addEventListener("click", async function () {
+    if (button.disabled || purchaseClickInFlight) return;
+    purchaseClickInFlight = true;
+    try {
+    if (!window.destinyBirthInput) {
+      status.textContent = "\u5148\u306b\u7121\u6599\u9451\u5b9a\u3092\u5b9f\u884c\u3057\u3066\u304f\u3060\u3055\u3044\u3002";
+      return;
+    }
+
+    let key;
+    try {
+      key = localStorage.getItem(keyName);
+      if (key) {
+        // PURCHASE_STATUS_VERIFY_V1
+        // Only a fresh server verification can release the old key.
+        status.textContent = "\u65e2\u5b58\u306e\u3054\u6ce8\u6587\u3092\u78ba\u8a8d\u3057\u3066\u3044\u307e\u3059\u3002";
+        const response = await fetch("/local-flow/purchase-status", {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({request_key: key, product: PRODUCT_CODE})
+        });
+        const data = await response.json();
+        if (!response.ok || !data.ok || data.status !== "paid") {
+          status.textContent = "\u65e2\u5b58\u306e\u3054\u6ce8\u6587\u3092\u78ba\u8a8d\u3067\u304d\u307e\u305b\u3093\u3002\u91cd\u8907\u8cfc\u5165\u3092\u907f\u3051\u308b\u305f\u3081\u3001\u30b5\u30dd\u30fc\u30c8\u306b\u304a\u554f\u3044\u5408\u308f\u305b\u304f\u3060\u3055\u3044\u3002";
+          return;
+        }
+        if (localStorage.getItem(keyName) !== key) {
+          status.textContent = "\u6ce8\u6587\u60c5\u5831\u304c\u5909\u66f4\u3055\u308c\u307e\u3057\u305f\u3002\u753b\u9762\u3092\u66f4\u65b0\u3057\u3066\u304f\u3060\u3055\u3044\u3002";
+          return;
+        }
+        // Only a verified paid request may be replaced for a new purchase.
+        if (!confirm(
+          "\u3053\u306e\u5546\u54c1\u306e\u4ee5\u524d\u306e\u304a\u652f\u6255\u3044\u306f\u78ba\u8a8d\u6e08\u307f\u3067\u3059\u3002\n\u65b0\u3057\u304f\u8cfc\u5165\u3057\u307e\u3059\u304b\uff1f"
+        )) {
+          status.textContent = "\u4ee5\u524d\u306e\u304a\u652f\u6255\u3044\u306f\u78ba\u8a8d\u6e08\u307f\u3067\u3059\u3002";
+          return;
+        }
+        if (localStorage.getItem(keyName) !== key) {
+          status.textContent = "\u6ce8\u6587\u60c5\u5831\u304c\u5909\u66f4\u3055\u308c\u307e\u3057\u305f\u3002\u753b\u9762\u3092\u66f4\u65b0\u3057\u3066\u304f\u3060\u3055\u3044\u3002";
+          return;
+        }
+        localStorage.removeItem(keyName);
+      }
+    } catch (_) {
+      status.textContent = "Storage unavailable. Test stopped.";
+      return;
+    }
+
+    // EMAIL_FORMAT_CONFIRM_V1: format only, not deliverability.
+    const enteredEmail = prompt("\u9451\u5b9a\u7d50\u679c\u3092\u304a\u5c4a\u3051\u3059\u308b\u30e1\u30fc\u30eb\u30a2\u30c9\u30ec\u30b9\u3092\u5165\u529b\u3057\u3066\u304f\u3060\u3055\u3044");
+    if (enteredEmail === null) return;
+    const email = enteredEmail.trim();
+    if (email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      status.textContent = "\u30e1\u30fc\u30eb\u30a2\u30c9\u30ec\u30b9\u306e\u5f62\u5f0f\u3092\u78ba\u8a8d\u3057\u3066\u304f\u3060\u3055\u3044\u3002";
+      return;
+    }
+    if (!confirm("\u9451\u5b9a\u7d50\u679c\u306e\u304a\u5c4a\u3051\u5148\u306f\u3053\u3061\u3089\u3067\u3088\u308d\u3057\u3044\u3067\u3059\u304b\uff1f\n\n" + email)) {
+      status.textContent = "\u30e1\u30fc\u30eb\u30a2\u30c9\u30ec\u30b9\u3092\u78ba\u8a8d\u3057\u3066\u304b\u3089\u304a\u9032\u307f\u304f\u3060\u3055\u3044\u3002";
+      return;
+    }
+
+    if (!crypto.randomUUID) {
+      status.textContent = "Secure request key unavailable.";
+      return;
+    }
+
+    key = crypto.randomUUID();
+    try {
+      localStorage.setItem(keyName, key);
+    } catch (_) {
+      status.textContent = "Storage unavailable. Test stopped.";
+      return;
+    }
+
+    button.disabled = true;
+    status.textContent = "Preparing Sandbox checkout...";
+
+    try {
+      const response = await fetch("/local-flow/create", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({request_key: key,customer_email: email.trim(),customer_name: ((document.getElementById('customerName')?.value || '').trim() || '\u304a\u5ba2\u69d8'),product: PRODUCT_CODE,birth: window.destinyBirthInput})
+      });
+      const data = await response.json();
+      if (!response.ok || !data.ok || !data.approval_url) {
+        throw new Error("checkout not confirmed");
+      }
+      const url = new URL(data.approval_url);
+      if (url.protocol !== "https:" ||
+          url.hostname !== "www.sandbox.paypal.com") {
+        throw new Error("unexpected approval host");
+      }
+      location.assign(url.href);
+    } catch (_) {
+      status.textContent = "Result uncertain. Do not create another order; request review.";
+    }
+    } finally {
+      purchaseClickInFlight = false;
+    }
+  });
+});
+</script>
+
+
+<script>
+/* CONSENT_SUCCESS_DISPLAY_20261120_V1 */
+(function () {
+  "use strict";
+
+  const paymentOld = "\u304a\u652f\u6255\u3044\u3092\u78ba\u8a8d\u3057\u307e\u3057\u305f\u3002\u9451\u5b9a\u66f8\u3092\u4f5c\u6210\u3057\u3001\u30e1\u30fc\u30eb\u3067\u304a\u5c4a\u3051\u3057\u307e\u3059\u3002";
+  const paymentNew = "\u304a\u652f\u6255\u3044\u3092\u78ba\u8a8d\u3057\u307e\u3057\u305f\u3002\u9451\u5b9a\u66f8\u3092\u4f5c\u6210\u4e2d\u3067\u3059\u3002\u5b8c\u6210\u5f8c\u3001\u30e1\u30fc\u30eb\u3067\u304a\u5c4a\u3051\u3057\u307e\u3059\u3002";
+  const successOld = "\u304a\u7533\u3057\u8fbc\u307f\u3042\u308a\u304c\u3068\u3046\u3054\u3056\u3044\u307e\u3059";
+  const successNew = "\u304a\u77e5\u3089\u305b\u306e\u53d7\u3051\u4ed8\u3051\u304c\u5b8c\u4e86\u3057\u307e\u3057\u305f\u3002";
+  const buttonText = "\u30e1\u30fc\u30eb\u3067\u53d7\u3051\u53d6\u308b";
+  const noticeText = "\u304a\u7533\u3057\u8fbc\u307f\u306f\u4efb\u610f\u3067\u3059";
+
+  function update() {
+    if (!document.body) return;
+    const walker = document.createTreeWalker(
+      document.body, NodeFilter.SHOW_TEXT
+  );
+    const nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+
+    for (const node of nodes) {
+      const parent = node.parentElement;
+      if (!parent || /^(SCRIPT|STYLE|NOSCRIPT)$/.test(parent.tagName)) continue;
+      if (node.nodeValue.includes(paymentOld)) {
+        node.nodeValue = node.nodeValue.replace(paymentOld, paymentNew);
+      }
+    }
+
+    for (const node of nodes) {
+      if (!node.nodeValue.includes(successOld)) continue;
+      let box = node.parentElement;
+      while (box && box !== document.body) {
+        const checkbox = box.querySelector('input[type="checkbox"]');
+        const buttons = Array.from(box.querySelectorAll("button"));
+        const button = buttons.find(b => b.textContent.trim() === buttonText);
+        if (checkbox && button) {
+          node.nodeValue = node.nodeValue.replace(successOld, successNew);
+          break;
+        }
+        box = box.parentElement;
+      }
+    }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", update);
+  } else {
+    update();
+  }
+  new MutationObserver(update).observe(document.documentElement, {
+    subtree: true, childList: true, characterData: true
+  });
+})();
+</script>
+
 
 </body>
 </html>

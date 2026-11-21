@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/preview/:path*",
+      "destination": "https://sandbox-api.destiny-code.xyz/preview/:path*"
+    },
+    {
+      "source": "/local-flow/:path*",
+      "destination": "https://sandbox-api.destiny-code.xyz/local-flow/:path*"
+    }
+  ]
+}

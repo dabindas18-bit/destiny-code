@@ -528,7 +528,7 @@ a {
 
     <img
       class="hero-image"
-      src="images/hero-main.png"
+      src="images/destiny-real-you-hero.png"
       alt="DESTINY CODE"
     >
 
@@ -634,13 +634,13 @@ a {
       <span class="reading-no">02</span>
       <small>WORK & CAREER</small>
       <h3>仕事・転職</h3>
-      <small>¥980 · 近日公開</small>
+      <small>¥980 · 無料プレビュー</small>
       <p>
         仕事で生かしやすい性質と、
         キャリアの流れを読み解きます。
       </p>
       <span class="arrow">
-        近日公開 →
+        鑑定する →
       </span>
     </a>
 
@@ -651,13 +651,13 @@ a {
       <span class="reading-no">03</span>
       <small>MONEY & VALUE</small>
       <h3>金運・財運</h3>
-      <small>¥980 · 近日公開</small>
+      <small>¥980 · 無料プレビュー</small>
       <p>
         お金との付き合い方や、
         財を扱うパターンを読み解きます。
       </p>
       <span class="arrow">
-        近日公開 →
+        鑑定する →
       </span>
     </a>
 
@@ -668,13 +668,13 @@ a {
       <span class="reading-no">04</span>
       <small>BUSINESS</small>
       <h3>事業・独立</h3>
-      <small>¥980 · 近日公開</small>
+      <small>¥980 · 無料プレビュー</small>
       <p>
         独立や事業に向き合うときの、
         自分らしい力の使い方を読みます。
       </p>
       <span class="arrow">
-        近日公開 →
+        鑑定する →
       </span>
     </a>
 
@@ -685,13 +685,13 @@ a {
       <span class="reading-no">05</span>
       <small>NEW YEAR FORTUNE</small>
       <h3>新年運勢</h3>
-      <small>¥1,980 · 近日公開</small>
+      <small>¥1,980 · 無料プレビュー</small>
       <p>
         年運と命式を重ね、
         新しい一年のテーマと流れを読み解きます。
       </p>
       <span class="arrow">
-        近日公開 →
+        鑑定する →
       </span>
     </a>
 
@@ -702,13 +702,13 @@ a {
       <span class="reading-no">06</span>
       <small>LIFE CYCLE</small>
       <h3>人生総合鑑定</h3>
-      <small>¥4,980 · 近日公開</small>
+      <small>¥4,980 · 無料プレビュー</small>
       <p>
         10年単位で巡る大運から、
         人生の大きな季節を見ていきます。
       </p>
       <span class="arrow">
-        近日公開 →
+        鑑定する →
       </span>
     </a>
 
@@ -736,7 +736,7 @@ a {
     class="primary"
     href="reading.html?category=full"
   >
-    人生総合鑑定 ¥4,980 · 近日公開
+    人生総合鑑定 ¥4,980 · 無料プレビュー
   </a>
 
 </section>
@@ -823,5 +823,46 @@ a {
 </footer>
 <!-- DESTINY CODE LEGAL FOOTER END -->
 
+
+<script>
+/* DESTINY_NEW_YEAR_LABEL_WORKSPACE */
+(function () {
+  function updateNewYearLabel() {
+    const parts = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Asia/Tokyo", year: "numeric", month: "numeric"
+    }).formatToParts(new Date());
+    const year = Number(parts.find(p => p.type === "year").value);
+    const month = Number(parts.find(p => p.type === "month").value);
+    const target = year + (month >= 7 ? 1 : 0);
+    const label = "\u65b0\u5e74\u904b\u52e2";
+    const replacement = target + "\u5e74" + label;
+
+    const query = new URLSearchParams(location.search);
+    if (query.get("category") === "year2027" || query.get("category") === "year") {
+      document.querySelectorAll("h1, h2").forEach(el => {
+        if (el.textContent.includes(label)) {
+          el.textContent = el.textContent.replace(/(?:\d{4}\u5e74)?\u65b0\u5e74\u904b\u52e2/g, replacement);
+        }
+      });
+    }
+
+    document.querySelectorAll('a[href*="category=year2027"]').forEach(link => {
+      const walker = document.createTreeWalker(link, NodeFilter.SHOW_TEXT);
+      const nodes = [];
+      while (walker.nextNode()) nodes.push(walker.currentNode);
+      nodes.forEach(node => {
+        node.nodeValue = node.nodeValue.replace(
+          /(?:\d{4}\u5e74)?\u65b0\u5e74\u904b\u52e2/g, replacement
+        );
+      });
+    });
+  }
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", updateNewYearLabel);
+  } else {
+    updateNewYearLabel();
+  }
+})();
+</script>
 </body>
 </html>

@@ -1,0 +1,1221 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <title>ご購入者さま限定のご案内</title>
+  <!-- EXISTING_SITE_DESIGN_V1 -->
+<style>
+:root{
+  --bg:#060914;
+  --panel:#0f1629;
+  --gold:#c9a85b;
+  --gold2:#ead596;
+  --text:#f5f1e8;
+  --muted:#979dac;
+  --line:rgba(201,168,91,.23);
+  --input:#090e1d;
+}
+
+*{
+  box-sizing:border-box;
+}
+
+html{
+  scroll-behavior:smooth;
+}
+
+body{
+  margin:0;
+  min-height:100vh;
+  background:
+    radial-gradient(circle at 50% 0%,#17213d 0,#090d1a 30%,#050711 70%);
+  color:var(--text);
+  font-family:
+    "Noto Serif JP",
+    "Yu Mincho",
+    "Hiragino Mincho ProN",
+    serif;
+}
+
+button,
+input,
+select{
+  font:inherit;
+}
+
+a{
+  color:inherit;
+  text-decoration:none;
+}
+
+.shell{
+  width:min(100%,720px);
+  margin:auto;
+}
+
+/* HEADER */
+
+header{
+  height:58px;
+  padding:0 18px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  border-bottom:1px solid var(--line);
+}
+
+.logo{
+  color:var(--gold2);
+  font-family:Arial,sans-serif;
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:.25em;
+}
+
+.back{
+  color:#767e8d;
+  font-family:Arial,sans-serif;
+  font-size:10px;
+}
+
+/* INPUT */
+
+.entry{
+  padding:35px 18px 65px;
+}
+
+.intro{
+  text-align:center;
+  margin-bottom:29px;
+}
+
+.kicker{
+  color:var(--gold);
+  font-family:Arial,sans-serif;
+  font-size:10px;
+  letter-spacing:.19em;
+}
+
+.intro h1{
+  margin:10px 0 12px;
+  font-size:31px;
+  font-weight:500;
+}
+
+.intro p{
+  margin:0 auto;
+  max-width:470px;
+  color:var(--muted);
+  line-height:1.8;
+  font-size:12px;
+}
+
+.quick{
+  margin:19px auto 0;
+  display:inline-flex;
+  gap:8px;
+  align-items:center;
+  color:#777f8f;
+  font-family:Arial,sans-serif;
+  font-size:10px;
+}
+
+.quick i{
+  width:3px;
+  height:3px;
+  border-radius:50%;
+  background:var(--gold);
+}
+
+.form-card{
+  padding:27px 20px;
+  background:
+    linear-gradient(145deg,rgba(17,25,46,.98),rgba(8,13,26,.98));
+  border:1px solid var(--line);
+}
+
+.group{
+  margin-bottom:24px;
+}
+
+label.field-title{
+  display:block;
+  margin-bottom:9px;
+  font-size:12px;
+  color:#ddd9cf;
+}
+
+.req{
+  color:var(--gold);
+  margin-left:3px;
+}
+
+.birth{
+  display:grid;
+  grid-template-columns:1.35fr 1fr 1fr;
+  gap:7px;
+}
+
+.time{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:7px;
+}
+
+input,
+select{
+  width:100%;
+  height:50px;
+  border:1px solid rgba(201,168,91,.24);
+  background:var(--input);
+  color:white;
+  border-radius:3px;
+  padding:0 11px;
+  outline:none;
+  font-size:13px;
+}
+
+input:focus,
+select:focus{
+  border-color:var(--gold);
+}
+
+input::placeholder{
+  color:#515a6c;
+}
+
+.gender{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+
+.gender input{
+  display:none;
+}
+
+.gender label{
+  height:48px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  border:1px solid rgba(201,168,91,.24);
+  background:var(--input);
+  color:#a3a8b3;
+  cursor:pointer;
+  font-size:12px;
+}
+
+.gender input:checked + label{
+  border-color:var(--gold);
+  color:var(--gold2);
+  background:#17192a;
+}
+
+.unknown{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-top:12px;
+  color:#969cab;
+  font-size:11px;
+  cursor:pointer;
+}
+
+.unknown input{
+  width:16px;
+  height:16px;
+  accent-color:var(--gold);
+}
+
+.help{
+  margin-top:7px;
+  color:#626a7b;
+  font-size:9px;
+  line-height:1.6;
+}
+
+.cta{
+  width:100%;
+  min-height:56px;
+  border:0;
+  border-radius:3px;
+  color:#111;
+  background:linear-gradient(120deg,#b78d3c,#e5cc7b);
+  font-size:13px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.cta:disabled{
+  opacity:0.45;
+  cursor:not-allowed;
+}
+
+.privacy{
+  margin-top:13px;
+  text-align:center;
+  color:#626a79;
+  font-family:Arial,sans-serif;
+  font-size:9px;
+}
+
+/* ANALYSIS */
+
+.analysis{
+  display:none;
+  min-height:calc(100vh - 58px);
+  padding:35px 18px 55px;
+  text-align:center;
+  overflow:hidden;
+  position:relative;
+}
+
+.analysis.active{
+  display:block;
+}
+
+.analysis:before{
+  content:"";
+  position:absolute;
+  width:280px;
+  height:280px;
+  left:50%;
+  top:90px;
+  transform:translateX(-50%);
+  border-radius:50%;
+  background:rgba(201,168,91,.08);
+  filter:blur(55px);
+  animation:pulse 2.2s infinite alternate;
+}
+
+@keyframes pulse{
+  from{opacity:.25;transform:translateX(-50%) scale(.9)}
+  to{opacity:.75;transform:translateX(-50%) scale(1.1)}
+}
+
+.analysis-image{
+  width:76%;
+  max-width:340px;
+  aspect-ratio:3/4;
+  object-fit:cover;
+  object-position:center top;
+  border-radius:180px 180px 16px 16px;
+  position:relative;
+  z-index:2;
+  border:1px solid rgba(201,168,91,.23);
+  box-shadow:0 25px 80px rgba(0,0,0,.55);
+}
+
+.analysis h2{
+  position:relative;
+  z-index:2;
+  font-size:24px;
+  font-weight:500;
+  line-height:1.6;
+  margin:25px 0 6px;
+}
+
+.analysis-sub{
+  position:relative;
+  z-index:2;
+  color:var(--gold);
+  font-family:Arial,sans-serif;
+  font-size:10px;
+  letter-spacing:.14em;
+}
+
+.steps{
+  width:min(100%,430px);
+  margin:29px auto 0;
+  text-align:left;
+  position:relative;
+  z-index:2;
+}
+
+.step{
+  min-height:45px;
+  border-bottom:1px solid rgba(201,168,91,.14);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  color:#777f8e;
+  font-size:11px;
+  transition:.3s;
+}
+
+.step.active{
+  color:#e9e5dc;
+}
+
+.step.done{
+  color:#bda35e;
+}
+
+.state{
+  font-family:Arial,sans-serif;
+  color:var(--gold);
+}
+
+/* RESULT */
+
+.result{
+  display:none;
+  padding:32px 18px 75px;
+}
+
+.result.active{
+  display:block;
+}
+
+.result-head{
+  text-align:center;
+  padding-bottom:30px;
+}
+
+.result-head .complete{
+  color:var(--gold);
+  font-family:Arial,sans-serif;
+  letter-spacing:.18em;
+  font-size:10px;
+}
+
+.result-head h2{
+  margin:10px 0 10px;
+  font-size:26px;
+  font-weight:500;
+}
+
+.result-head p{
+  margin:0;
+  color:var(--muted);
+  font-size:11px;
+  line-height:1.8;
+}
+
+.theme-image{
+  width:100%;
+  max-height:430px;
+  object-fit:cover;
+  object-position:center 25%;
+  border:1px solid var(--line);
+  display:block;
+}
+
+.fact-title{
+  text-align:center;
+  margin:38px 0 20px;
+}
+
+.fact-title small{
+  color:var(--gold);
+  font-family:Arial,sans-serif;
+  letter-spacing:.15em;
+  font-size:9px;
+}
+
+.fact-title h3{
+  margin:9px 0 0;
+  font-size:20px;
+  font-weight:500;
+}
+
+.facts{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  border-top:1px solid var(--line);
+  border-bottom:1px solid var(--line);
+}
+
+.fact{
+  padding:20px 5px;
+  text-align:center;
+  border-right:1px solid var(--line);
+}
+
+.fact:last-child{
+  border-right:0;
+}
+
+.fact small{
+  display:block;
+  color:#676f7d;
+  font-size:9px;
+  margin-bottom:8px;
+}
+
+.fact strong{
+  color:#b0b5bf;
+  font-size:12px;
+  font-weight:400;
+}
+
+.engine-wait{
+  margin:18px 0 0;
+  color:#646c7b;
+  text-align:center;
+  font-family:Arial,sans-serif;
+  font-size:9px;
+}
+
+.preview{
+  margin:45px 0;
+  padding:28px 22px;
+  background:#0d1426;
+  border-left:2px solid var(--gold);
+}
+
+.preview small{
+  color:var(--gold);
+  font-family:Arial,sans-serif;
+  letter-spacing:.16em;
+  font-size:9px;
+}
+
+.preview h3{
+  margin:12px 0;
+  font-size:20px;
+  font-weight:500;
+}
+
+.preview p{
+  color:#9198a6;
+  font-size:12px;
+  line-height:2;
+  margin:0;
+}
+
+.dev-label{
+  display:inline-block;
+  margin-top:17px;
+  padding:5px 8px;
+  border:1px solid #403d33;
+  color:#82765c;
+  font-family:Arial,sans-serif;
+  font-size:8px;
+}
+
+/* PAYWALL */
+
+.paywall{
+  padding-top:10px;
+}
+
+.payment-image{
+  width:100%;
+  max-height:460px;
+  object-fit:cover;
+  object-position:center 22%;
+  display:block;
+  border:1px solid var(--line);
+}
+
+.pay-copy{
+  text-align:center;
+  padding:31px 15px 20px;
+}
+
+.pay-copy small{
+  color:var(--gold);
+  letter-spacing:.15em;
+  font-family:Arial,sans-serif;
+  font-size:9px;
+}
+
+.pay-copy h3{
+  margin:12px 0 15px;
+  font-size:24px;
+  font-weight:500;
+  line-height:1.55;
+}
+
+.pay-copy p{
+  color:#8d94a1;
+  font-size:11px;
+  line-height:1.9;
+}
+
+.lock-list{
+  margin:15px auto 25px;
+  max-width:470px;
+  border-top:1px solid var(--line);
+}
+
+.lock-item{
+  display:flex;
+  gap:12px;
+  padding:14px 5px;
+  border-bottom:1px solid var(--line);
+  color:#a2a7b1;
+  font-size:11px;
+}
+
+.lock{
+  color:var(--gold);
+}
+
+.pay-button{
+  width:100%;
+  min-height:58px;
+  border:0;
+  border-radius:3px;
+  background:linear-gradient(120deg,#b58c3c,#e6cc7a);
+  color:#111;
+  font-size:13px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.payment-note{
+  margin-top:12px;
+  text-align:center;
+  color:#606777;
+  font-size:9px;
+}
+
+/* DESKTOP */
+
+@media(min-width:760px){
+
+  .shell{
+    width:min(100%,760px);
+  }
+
+  .entry{
+    padding-top:55px;
+  }
+
+  .form-card{
+    padding:38px 44px;
+  }
+
+  .intro h1{
+    font-size:36px;
+  }
+}
+
+
+/* STORY PAYWALL V1 */
+
+.story-open-loop {
+  position:relative;
+  height:310px;
+  margin-top:30px;
+  overflow:hidden;
+}
+
+.story-open-loop p {
+  margin:0;
+  color:rgba(255,255,255,.88);
+  font-size:14px;
+  line-height:2.15;
+}
+
+.story-open-loop::after {
+  content:"";
+  position:absolute;
+  z-index:2;
+  left:0;
+  right:0;
+  bottom:0;
+  height:235px;
+  pointer-events:none;
+  background:linear-gradient(
+    to bottom,
+    rgba(14,22,42,0) 0%,
+    rgba(14,22,42,.06) 12%,
+    rgba(14,22,42,.20) 28%,
+    rgba(14,22,42,.47) 48%,
+    rgba(14,22,42,.75) 68%,
+    rgba(14,22,42,.93) 84%,
+    #0e162a 100%
+  );
+}
+
+.story-lock {
+  text-align:center;
+  color:#c9a85b;
+  font-size:19px;
+  margin-top:7px;
+}
+
+.payment-emotion {
+  margin:36px auto 28px;
+  text-align:center;
+}
+
+.payment-emotion .emotion {
+  margin:0;
+  color:#fff;
+  font-size:clamp(23px,5vw,34px);
+  font-weight:500;
+  line-height:1.55;
+}
+
+.payment-emotion .value {
+  max-width:550px;
+  margin:18px auto 0;
+  color:#abb2c0;
+  font-size:13px;
+  line-height:2;
+}
+
+.payment-product {
+  margin:30px auto 25px;
+  text-align:center;
+}
+
+.payment-product .name {
+  color:#c9a85b;
+  font-family:Arial,sans-serif;
+  font-size:10px;
+  letter-spacing:.17em;
+}
+
+.payment-product .price {
+  margin-top:10px;
+  color:#fff;
+  font-family:Arial,sans-serif;
+  font-size:31px;
+}
+
+.payment-product .tax {
+  margin-left:5px;
+  color:#757d8e;
+  font-size:10px;
+}
+
+.after-payment-intro {
+  margin-bottom:32px;
+  padding-bottom:28px;
+  border-bottom:
+    1px solid rgba(201,168,91,.18);
+}
+
+.after-payment-intro .emotion {
+  margin:0 0 13px;
+  color:#c9a85b;
+  font-size:22px;
+  line-height:1.6;
+}
+
+.after-payment-intro .continue {
+  margin:0;
+  color:#abb2c0;
+  font-size:13px;
+  line-height:2;
+}
+
+
+/* LOVE RESULT CARDS V1 */
+
+.reading-chapters{
+  margin-top:34px;
+}
+
+.reading-chapter{
+  position:relative;
+  padding:38px 4px 42px;
+  border-top:
+    1px solid rgba(201,168,91,.18);
+}
+
+.reading-chapter:first-child{
+  border-top:0;
+  padding-top:8px;
+}
+
+.chapter-number{
+  color:#c9a85b;
+  font-family:Arial,sans-serif;
+  font-size:10px;
+  letter-spacing:.20em;
+  margin-bottom:12px;
+}
+
+.chapter-title{
+  margin:0 0 22px;
+  color:#fff;
+  font-size:21px;
+  font-weight:500;
+  line-height:1.65;
+}
+
+.chapter-body{
+  margin:0;
+  color:rgba(255,255,255,.84);
+  font-size:14px;
+  line-height:2.15;
+  white-space:pre-wrap;
+}
+
+.reading-chapter.destiny-letter{
+  margin-top:20px;
+  padding:40px 24px;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(201,168,91,.08),
+      rgba(14,22,42,.6)
+    );
+  border:
+    1px solid rgba(201,168,91,.18);
+}
+
+.reading-chapter.destiny-letter
+.chapter-title{
+  color:#c9a85b;
+  letter-spacing:.06em;
+}
+
+.result-end{
+  margin-top:42px;
+  padding-top:32px;
+  border-top:
+    1px solid rgba(201,168,91,.18);
+  text-align:center;
+}
+
+.result-end .small{
+  color:#777f8f;
+  font-size:10px;
+  letter-spacing:.10em;
+}
+
+.result-end .message{
+  margin-top:12px;
+  color:#c9a85b;
+  font-size:16px;
+  line-height:1.8;
+}
+
+</style>
+<style id="birthPlaceSimpleStyle">
+.birth-place-options{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.birth-place-option{display:flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:10px 12px;border:1px solid rgba(255,255,255,.14);border-radius:12px;background:rgba(255,255,255,.04);color:#f5efe4;font-size:14px;cursor:pointer;box-sizing:border-box;}
+.birth-place-option input{accent-color:#b69b63;}
+</style>
+<style>
+/* OFFER_PREMIUM_UI_V1 */
+* { box-sizing: border-box; }
+
+main { max-width: 620px; margin: 48px auto; padding: 0 20px 70px; }
+.panel {
+  border: 1px solid #7d653f; background: #211e25;
+  padding: 36px; box-shadow: 0 16px 45px #0005;
+}
+.eyebrow { color: #d9ba7b; letter-spacing: .18em; font-size: 12px; }
+h1 { color: #f1dfb6; font-size: 1.6rem; line-height: 1.5; }
+h2 { color: #eddfc3; }
+.intro { color: #d1c6b5; }
+#status, .note { color: #bfb4a2; font-size: .92rem; }
+.customer {
+  background: #18171c; padding: 16px; border: 1px solid #493e30;
+  color: #e6ddcd; overflow-wrap: anywhere;
+}
+.regular { color: #aaa093; text-decoration: line-through; }
+strong { color: #edcb7b; font-size: 2rem; }
+#deadline {
+  border-top: 1px solid #514331; border-bottom: 1px solid #514331;
+  padding: 13px 0; color: #f0d69f; font-weight: bold;
+}
+.cta {
+  display: block; width: 100%; padding: 16px; border: 0;
+  background: linear-gradient(120deg,#a77b32,#e1c17a,#a77b32);
+  color: #251b0d; font-weight: bold; font-size: 1rem;
+}
+.cta:disabled { opacity: .65; cursor: not-allowed; }
+@media(max-width: 480px) {
+  .panel { padding: 24px; }
+}
+</style>
+<style>/* OFFER_CENTER_TEXT_V1 */ .panel { text-align: center; }</style>
+<style>.panel h1,.panel .intro { text-wrap: balance; }</style>
+</head>
+<body>
+
+<div class="shell"><header>
+  <a class="logo" href="index.html">
+    DESTINY CODE
+  </a>
+
+  <a class="back" href="index.html#readings">
+    ← MENU
+  </a>
+</header></div>
+<main>
+  <div class="panel">
+    <p class="eyebrow">YOUR NEXT CHAPTER</p>
+    <h1>&#20170;&#24180;&#12398;&#27969;&#12428;&#12398;&#27425;&#12395;&#12399;&#12289;<br>
+      &#20154;&#29983;&#20840;&#20307;&#12398;&#27969;&#12428;&#12434;&#12290;</h1>
+    <p class="intro">
+      &#29983;&#12414;&#12428;&#25345;&#12387;&#12383;&#29305;&#24615;&#12420;&#24375;&#12415;&#12289;
+      &#20154;&#29983;&#12398;&#36578;&#27231;&#12289;&#20181;&#20107;&#12420;&#20154;&#38291;&#38306;&#20418;&#12398;
+      &#22823;&#12365;&#12394;&#27969;&#12428;&#12434;&#12289;&#12418;&#12387;&#12392;&#28145;&#12367;
+      &#35211;&#12388;&#12417;&#12390;&#12415;&#12414;&#12379;&#12435;&#12363;&#12290;
+    </p>
+    <p id="status">&#29305;&#21029;&#20385;&#26684;&#12434;&#30906;&#35469;&#12375;&#12390;&#12356;&#12414;&#12377;&#12290;</p>
+    <div id="offer" hidden>
+      <h2 id="product"></h2>
+      <p><span id="regular" class="regular"></span><br>
+        &#12354;&#12394;&#12383;&#38480;&#23450; <strong id="price"></strong></p>
+      <p id="deadline"></p>
+      <button class="cta" type="button" disabled>
+        &#29305;&#21029;&#20385;&#26684;&#12391;&#27425;&#12398;&#9457;&#23450;&#12434;&#35211;&#12427;
+      </button>
+      <p class="note">ありがとうございます。あなたの運勢をお伝えできて。</p>
+      <p class="note">&#12371;&#12398;&#12522;&#12531;&#12463;&#12399;&#12372;&#36092;&#20837;&#32773;&#12373;&#12414;&#23554;&#29992;&#12391;&#12377;&#12290;</p>
+    </div>
+  </div>
+</main>
+
+<script>
+(async function () {
+  const status = document.getElementById("status");
+
+  // DISCOUNT_PAYPAL_CONNECT_V1
+  const MSG = {
+    busy: "\u304a\u652f\u6255\u3044\u753b\u9762\u3078\u79fb\u52d5\u3057\u307e\u3059\u3002",
+    confirming: "\u304a\u652f\u6255\u3044\u3092\u78ba\u8a8d\u3057\u3066\u3044\u307e\u3059\u3002",
+    success: "\u304a\u652f\u6255\u3044\u3092\u78ba\u8a8d\u3057\u307e\u3057\u305f\u3002\u9451\u5b9a\u66f8\u3092\u4f5c\u6210\u3057\u3001\u30e1\u30fc\u30eb\u3067\u304a\u5c4a\u3051\u3057\u307e\u3059\u3002",
+    cancel: "\u304a\u652f\u6255\u3044\u306f\u5b8c\u4e86\u3057\u3066\u3044\u307e\u305b\u3093\u3002\u30e1\u30fc\u30eb\u306e\u30ea\u30f3\u30af\u304b\u3089\u3001\u3082\u3046\u4e00\u5ea6\u304a\u8a66\u3057\u304f\u3060\u3055\u3044\u3002",
+    hold: "\u78ba\u8a8d\u306b\u6642\u9593\u304c\u304b\u304b\u3063\u3066\u3044\u307e\u3059\u3002\u518d\u5ea6\u306e\u304a\u652f\u6255\u3044\u306f\u305b\u305a\u3001\u3057\u3070\u3089\u304f\u304a\u5f85\u3061\u304f\u3060\u3055\u3044\u3002",
+    fail: "\u304a\u624b\u7d9a\u304d\u3092\u958b\u59cb\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f\u3002\u6642\u9593\u3092\u304a\u3044\u3066\u304a\u8a66\u3057\u304f\u3060\u3055\u3044\u3002"
+  };
+  const ATT = "destiny_discount_attempt_v1";
+  const makeKey = function () { return crypto.randomUUID(); };
+  const returnParams = new URLSearchParams(location.search);
+  if (returnParams.get("paypal_return") === "1" || returnParams.get("paypal_cancel") === "1") {
+    history.replaceState(null, "", location.pathname);
+    if (returnParams.get("paypal_cancel") === "1") {
+      status.textContent = MSG.cancel;
+      return;
+    }
+    let saved = null;
+    try { saved = JSON.parse(localStorage.getItem(ATT) || "null"); } catch (_) {}
+    const paypalToken = returnParams.get("token");
+    if (!saved || typeof saved.key !== "string" || !paypalToken) {
+      status.textContent = MSG.hold;
+      return;
+    }
+    status.textContent = MSG.confirming;
+    try {
+      const res = await fetch("/local-flow/confirm", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({request_key: saved.key, paypal_token: paypalToken})
+      });
+      const data = await res.json();
+      if (res.ok && data.ok && data.status === "paid") {
+        localStorage.removeItem(ATT);
+        status.textContent = MSG.success;
+      // MARKETING_CONSENT_UI_V1
+      {
+        const box = document.createElement("div");
+        box.style.cssText = "margin:24px auto 0;max-width:520px;padding:20px;text-align:center;box-sizing:border-box;";
+        const label = document.createElement("label");
+        const check = document.createElement("input");
+        check.type = "checkbox";
+        check.checked = false;
+        label.style.cssText = "display:flex;align-items:center;justify-content:center;gap:8px;";
+        check.style.cssText = "position:static;display:inline-block;width:18px;height:18px;margin:0;flex:0 0 auto;";
+        label.append(document.createTextNode(
+          "\uff1c\u4efb\u610f\uff1e\u304a\u5f97\u306a\u5272\u5f15\u60c5\u5831\u3092\u30e1\u30fc\u30eb\u3067\u53d7\u3051\u53d6\u308b"
+        ), check);
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = "\u30e1\u30fc\u30eb\u3067\u53d7\u3051\u53d6\u308b";
+        button.style.cssText = "display:block;margin:12px auto 0;padding:10px 20px;background:#c6aa70;color:#17151b;border:0;border-radius:4px;cursor:pointer;";
+        const message = document.createElement("p");
+        message.setAttribute("role", "status");
+        button.addEventListener("click", async () => {
+          if (!check.checked) return;
+          button.disabled = true;
+          try {
+            const response = await fetch("/local-flow/marketing-consent", {
+              method: "POST",
+              headers: {"Content-Type": "application/json"},
+              body: JSON.stringify({request_key: saved.key, paypal_token: paypalToken})
+            });
+            const result = await response.json();
+            if (!response.ok || !result.ok) throw new Error("consent failed");
+            message.textContent = result.created === true
+              ? "\u304a\u7533\u3057\u8fbc\u307f\u3042\u308a\u304c\u3068\u3046\u3054\u3056\u3044\u307e\u3059"
+              : "\u3053\u306e\u7533\u3057\u8fbc\u307f\u306f\u51e6\u7406\u6e08\u307f\u3067\u3059\u3002\u73fe\u5728\u306e\u914d\u4fe1\u8a2d\u5b9a\u306f\u5909\u66f4\u3055\u308c\u307e\u305b\u3093\u3002";
+          } catch (_) {
+            message.textContent = "\u767b\u9332\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f\u3002\u304a\u652f\u6255\u3044\u306b\u5f71\u97ff\u306f\u3042\u308a\u307e\u305b\u3093\u3002";
+            button.disabled = false;
+          }
+        });
+        const note = document.createElement("p");
+        note.textContent = "\u304a\u7533\u3057\u8fbc\u307f\u306f\u4efb\u610f\u3067\u3059\u3002\u30c1\u30a7\u30c3\u30af\u3057\u306a\u3051\u308c\u3070\u767b\u9332\u3055\u308c\u307e\u305b\u3093\u3002\u914d\u4fe1\u306f\u3044\u3064\u3067\u3082\u505c\u6b62\u3067\u304d\u307e\u3059\u3002";
+        box.append(label, button, message);
+        status.insertAdjacentElement("afterend", box);
+      }
+
+      } else {
+        status.textContent = MSG.hold;
+      }
+    } catch (_) {
+      status.textContent = MSG.hold;
+    }
+    return;
+  }
+
+  const token = new URLSearchParams(location.hash.slice(1)).get("token");
+
+  // Remove the token from the visible address and browser history.
+  history.replaceState(null, "", location.pathname);
+
+  if (!token || !/^[A-Za-z0-9_-]{43}$/.test(token)) {
+    status.textContent = "リンクを確認できません。";
+    return;
+  }
+
+  try {
+    const response = await fetch("/local-flow/offer", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({token: token})
+    });
+    const data = await response.json();
+
+    if (data.error === "offer_expired") {
+      // REGULAR_PRICE_EXPIRY_LINK_V1
+      const regular = {
+        "NEW_YEAR_1980": {
+          label: "\u65b0\u5e74\u904b\u52e2\u3092\u901a\u5e38\u4fa1\u683c\u3067\u898b\u308b",
+          url: "/reading.html?category=year2027"
+        },
+        "LIFETIME_4980": {
+          label: "\u5e73\u751f\u904b\u3092\u901a\u5e38\u4fa1\u683c\u3067\u898b\u308b",
+          url: "/reading.html?category=full"
+        }
+      }[data.target_product];
+
+      if (!regular) throw new Error("unknown product");
+      status.textContent = "\u7279\u5225\u4fa1\u683c\u306e\u3054\u6848\u5185\u306f\u671f\u9650\u3092\u904e\u304e\u307e\u3057\u305f\u3002";
+
+      const link = document.createElement("a");
+      link.href = regular.url;
+      link.textContent = regular.label;
+      link.style.cssText =
+        "display:inline-block;margin-top:12px;padding:12px 18px;" +
+        "background:#c6aa70;color:#222;text-decoration:none;border-radius:4px;";
+      status.insertAdjacentElement("afterend", link);
+      return;
+    }
+    const products = {
+      "NEW_YEAR_1980": "新年運勢",
+      "LIFETIME_4980": "平生運"
+    };
+    if (!response.ok || !data.ok || !products[data.target_product] ||
+        ![1000, 3000, 4000].includes(data.amount_jpy) ||
+        data.currency !== "JPY") {
+      throw new Error("offer not confirmed");
+    }
+
+    const deadline = new Date(data.deadline);
+    if (Number.isNaN(deadline.getTime())) throw new Error("invalid deadline");
+    document.getElementById("product").textContent =
+      products[data.target_product];
+    document.getElementById("price").textContent =
+      data.amount_jpy.toLocaleString("ja-JP") + "円";
+    document.getElementById("deadline").textContent =
+      "お支払い期限：" + new Intl.DateTimeFormat("ja-JP", {
+        timeZone: "Asia/Tokyo",
+        dateStyle: "long",
+        timeStyle: "medium"
+      }).format(deadline) + "（日本時間）";
+    status.textContent = "ご購入者さま限定の特別価格です。";
+    // DISCOUNT_CUSTOMER_DISPLAY_V1
+    if (typeof data.customer_name !== "string" ||
+        typeof data.customer_email_masked !== "string") {
+      throw new Error("customer information unavailable");
+    }
+
+    const customer = document.createElement("p");
+    customer.className = "customer";
+    customer.textContent =
+      "\u3054\u6ce8\u6587\u8005: " + data.customer_name +
+      " / \u30e1\u30fc\u30eb: " + data.customer_email_masked;
+    document.getElementById("offer").prepend(customer);
+
+    // OFFER_SOURCE_BIRTH_DISPLAY_V1
+    const details = document.createElement("div");
+    details.className = "customer";
+    details.style.marginTop = "8px";
+
+    const b = data.birth;
+    const validDate = b && Number.isInteger(b.year) &&
+      Number.isInteger(b.month) && Number.isInteger(b.day) &&
+      b.month >= 1 && b.month <= 12 && b.day >= 1 && b.day <= 31;
+
+    if (!validDate || typeof b.birth_time_unknown !== "boolean") {
+      details.textContent = "\u51fa\u751f\u60c5\u5831\u3092\u78ba\u8a8d\u3067\u304d\u307e\u305b\u3093\u3002";
+    } else {
+      const addLine = function(label, value) {
+        const line = document.createElement("div");
+        line.textContent = label + value;
+        details.appendChild(line);
+      };
+      addLine(
+        "\u751f\u5e74\u6708\u65e5\uff1a",
+        b.year + "\u5e74" + b.month + "\u6708" + b.day + "\u65e5"
+      );
+
+      let time;
+      if (b.birth_time_unknown) {
+        time = "\u4e0d\u660e";
+      } else if (Number.isInteger(b.hour) && b.hour >= 0 && b.hour <= 23 &&
+                 Number.isInteger(b.minute) && b.minute >= 0 && b.minute <= 59) {
+        time = String(b.hour).padStart(2, "0") + ":" +
+               String(b.minute).padStart(2, "0");
+      } else {
+        time = "\u78ba\u8a8d\u3067\u304d\u307e\u305b\u3093";
+      }
+      addLine("\u51fa\u751f\u6642\u9593\uff1a", time);
+
+      if (typeof b.birth_place === "string" && b.birth_place.trim()) {
+        addLine("\u51fa\u751f\u5730\uff1a", b.birth_place);
+      }
+    }
+    customer.insertAdjacentElement("afterend", details);
+
+
+    document.getElementById("regular").textContent = (data.target_product === "LIFETIME_4980" ? "4,980" : "1,980") + "\u5186";
+
+    // OFFER_DEADLINE_AND_PRODUCT_V1
+    const panel = document.querySelector(".panel");
+    const deadlineEl = document.getElementById("deadline");
+    const heading = document.querySelector(".panel h1");
+    const intro = document.querySelector(".panel .intro");
+    const cta = document.querySelector(".panel .cta");
+    if (!panel || !deadlineEl || !heading || !intro || !cta) {
+      throw new Error("offer layout unavailable");
+    }
+
+    // Move the server-verified deadline to the top; no invented countdown.
+    panel.insertBefore(deadlineEl, panel.firstChild);
+    deadlineEl.style.cssText =
+      "display:block;text-align:center;color:#f0d69f;font-size:1.15rem;" +
+      "font-weight:bold;border:1px solid #9b7b46;padding:16px;margin:0 0 28px;";
+
+    if (data.target_product === "LIFETIME_4980") {
+      heading.textContent =
+        "\u4eca\u5e74\u306e\u904b\u52e2\u306e\u5148\u306b\u3042\u308b\u3001\u4eba\u751f\u306e\u5927\u304d\u306a\u6d41\u308c\u3078\u3002";
+      intro.textContent =
+        "\u751f\u307e\u308c\u6301\u3063\u305f\u7279\u6027\u3084\u5f37\u307f\u3001" +
+        "\u4eba\u751f\u306e\u8ee2\u6a5f\u3084\u4ed5\u4e8b\u30fb\u4eba\u9593\u95a2\u4fc2\u306e\u6d41\u308c\u3092\u3001" +
+        "\u9577\u3044\u8996\u70b9\u3067\u898b\u3064\u3081\u3066\u307f\u307e\u305b\u3093\u304b\u3002";
+    } else {
+      heading.textContent =
+        "\u3042\u306a\u305f\u306e\u3053\u308c\u304b\u3089\u306e\u4e00\u5e74\u3092\u3001\u3082\u3063\u3068\u6df1\u304f\u3002";
+      intro.textContent =
+        "\u4ed5\u4e8b\u3084\u4eba\u9593\u95a2\u4fc2\u306a\u3069\u3001" +
+        "\u3053\u308c\u304b\u3089\u306e\u4e00\u5e74\u306e\u6d41\u308c\u3092\u898b\u3064\u3081\u3066\u307f\u307e\u305b\u3093\u304b\u3002";
+    }
+    cta.textContent =
+      "\u7279\u5225\u4fa1\u683c\u3067" + products[data.target_product] +
+      "\u3092\u898b\u308b";
+
+
+    // OFFER_BALANCED_LINES_V1
+    if (data.target_product === "LIFETIME_4980") {
+      heading.textContent =
+        "\u4eca\u5e74\u306e\u904b\u52e2\u306e\u5148\u306b\u3042\u308b\u3001\n" +
+        "\u4eba\u751f\u306e\u5927\u304d\u306a\u6d41\u308c\u3078\u3002";
+      heading.style.whiteSpace = "pre-line";
+    }
+
+        // DISCOUNT_PAYPAL_CONNECT_V1
+    const keyName = "destiny_discount_key_v1_" + token.slice(0, 16);
+    let reqKey = localStorage.getItem(keyName);
+    if (!reqKey) { reqKey = makeKey(); localStorage.setItem(keyName, reqKey); }
+    cta.disabled = false;
+    cta.addEventListener("click", async function () {
+      cta.disabled = true;
+      status.textContent = MSG.busy;
+      try {
+        localStorage.setItem(ATT, JSON.stringify({key: reqKey}));
+        const res = await fetch("/local-flow/discount-create", {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({request_key: reqKey, token: token})
+        });
+        const data = await res.json();
+        if (!res.ok || !data.ok || typeof data.approval_url !== "string" ||
+            !data.approval_url.startsWith("https://www.sandbox.paypal.com/")) {
+          throw new Error("checkout not created");
+        }
+        location.href = data.approval_url;
+      } catch (_) {
+        status.textContent = MSG.fail;
+      }
+    });
+    document.getElementById("offer").hidden = false;
+  } catch (_) {
+    status.textContent = "特別価格を確認できませんでした。時間をおいてお試しください。";
+  }
+})();
+</script>
+
+<script>
+/* CONSENT_SUCCESS_DISPLAY_20261120_V1 */
+(function () {
+  "use strict";
+
+  const paymentOld = "\u304a\u652f\u6255\u3044\u3092\u78ba\u8a8d\u3057\u307e\u3057\u305f\u3002\u9451\u5b9a\u66f8\u3092\u4f5c\u6210\u3057\u3001\u30e1\u30fc\u30eb\u3067\u304a\u5c4a\u3051\u3057\u307e\u3059\u3002";
+  const paymentNew = "\u304a\u652f\u6255\u3044\u3092\u78ba\u8a8d\u3057\u307e\u3057\u305f\u3002\u9451\u5b9a\u66f8\u3092\u4f5c\u6210\u4e2d\u3067\u3059\u3002\u5b8c\u6210\u5f8c\u3001\u30e1\u30fc\u30eb\u3067\u304a\u5c4a\u3051\u3057\u307e\u3059\u3002";
+  const successOld = "\u304a\u7533\u3057\u8fbc\u307f\u3042\u308a\u304c\u3068\u3046\u3054\u3056\u3044\u307e\u3059";
+  const successNew = "\u304a\u77e5\u3089\u305b\u306e\u53d7\u3051\u4ed8\u3051\u304c\u5b8c\u4e86\u3057\u307e\u3057\u305f\u3002";
+  const buttonText = "\u30e1\u30fc\u30eb\u3067\u53d7\u3051\u53d6\u308b";
+  const noticeText = "\u304a\u7533\u3057\u8fbc\u307f\u306f\u4efb\u610f\u3067\u3059";
+
+  function update() {
+    if (!document.body) return;
+    const walker = document.createTreeWalker(
+      document.body, NodeFilter.SHOW_TEXT
+  );
+    const nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+
+    for (const node of nodes) {
+      const parent = node.parentElement;
+      if (!parent || /^(SCRIPT|STYLE|NOSCRIPT)$/.test(parent.tagName)) continue;
+      if (node.nodeValue.includes(paymentOld)) {
+        node.nodeValue = node.nodeValue.replace(paymentOld, paymentNew);
+      }
+    }
+
+    for (const node of nodes) {
+      if (!node.nodeValue.includes(successOld)) continue;
+      let box = node.parentElement;
+      while (box && box !== document.body) {
+        const checkbox = box.querySelector('input[type="checkbox"]');
+        const buttons = Array.from(box.querySelectorAll("button"));
+        const button = buttons.find(b => b.textContent.trim() === buttonText);
+        if (checkbox && button) {
+          node.nodeValue = node.nodeValue.replace(successOld, successNew);
+          break;
+        }
+        box = box.parentElement;
+      }
+    }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", update);
+  } else {
+    update();
+  }
+  new MutationObserver(update).observe(document.documentElement, {
+    subtree: true, childList: true, characterData: true
+  });
+})();
+</script>
+
+</body>
+</html>
