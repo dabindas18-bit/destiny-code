@@ -1175,6 +1175,15 @@ strong { color: #edcb7b; font-size: 2rem; }
             approval.username || approval.password) {
           throw new Error("unexpected approval host");
         }
+        if (data.resumed_existing === true) {
+          cta.disabled = false;
+          if (!confirm("\u4e00\u6642\u7684\u306b\u6c7a\u6e08\u753b\u9762\u3092\u958b\u3051\u307e\u305b\u3093\u3067\u3057\u305f\u3002\n\u3082\u3046\u4e00\u5ea6\u958b\u304d\u307e\u3059\u304b\uff1f")) { status.textContent = ""; return; }
+          if (localStorage.getItem(keyName) !== reqKey) {
+            status.textContent = MSG.fail;
+            return;
+          }
+          cta.disabled = true;
+        }
         location.href = approval.href;
       } catch (_) {
         status.textContent = MSG.fail;
