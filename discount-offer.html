@@ -1164,11 +1164,18 @@ strong { color: #edcb7b; font-size: 2rem; }
           }
           return;
         }
-        if (!res.ok || !data.ok || typeof data.approval_url !== "string" ||
-            !data.approval_url.startsWith("https://www.sandbox.paypal.com/")) {
+        if (!res.ok || !data.ok || typeof data.approval_url !== "string") {
           throw new Error("checkout not created");
         }
-        location.href = data.approval_url;
+        const approval = new URL(data.approval_url);
+        const expectedHost = data.environment === "sandbox" ? "www.sandbox.paypal.com" :
+          data.environment === "live" ? "www.paypal.com" : "";
+        if (!expectedHost || approval.protocol !== "https:" ||
+            approval.hostname !== expectedHost || approval.port ||
+            approval.username || approval.password) {
+          throw new Error("unexpected approval host");
+        }
+        location.href = approval.href;
       } catch (_) {
         status.textContent = MSG.fail;
       }

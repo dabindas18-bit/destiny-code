@@ -3128,8 +3128,26 @@ document.addEventListener("DOMContentLoaded", async function () {
     );
 
     try {
-      const key = localStorage.getItem(keyName);
       const token = params.get("token");
+      let key = localStorage.getItem(keyName);
+
+      // Temporary bridge for a resumed Live order returning to the other domain.
+      if (location.protocol === "https:" &&
+          (location.hostname === "destiny-code.xyz" ||
+           location.hostname === "www.destiny-code.xyz") &&
+          token && /^[A-Za-z0-9_-]{1,100}$/.test(token)) {
+        const cookieName = "dc_resume_" + token;
+        const matches = document.cookie.split(";").map(x => x.trim())
+          .filter(x => x.startsWith(cookieName + "="));
+        if (matches.length > 1) throw new Error("ambiguous return data");
+        if (matches.length === 1) {
+          const bridgeKey = decodeURIComponent(matches[0].slice(cookieName.length + 1));
+          if (!/^[A-Za-z0-9_-]{1,80}$/.test(bridgeKey))
+            throw new Error("invalid return data");
+          key = bridgeKey;
+        }
+      }
+
       if (!key || !token) throw new Error("missing return data");
 
       const response = await fetch("/local-flow/confirm", {
@@ -3140,6 +3158,14 @@ document.addEventListener("DOMContentLoaded", async function () {
       const data = await response.json();
       if (!response.ok || !data.ok || data.status !== "paid") {
         throw new Error("payment not confirmed");
+      }
+
+      if (token && /^[A-Za-z0-9_-]{1,100}$/.test(token) &&
+          location.protocol === "https:" &&
+          (location.hostname === "destiny-code.xyz" ||
+           location.hostname === "www.destiny-code.xyz")) {
+        document.cookie = "dc_resume_" + token +
+          "=; Domain=destiny-code.xyz; Path=/reading.html; Max-Age=0; Secure; SameSite=Lax";
       }
 
       // Mark only the request that the server confirmed as paid.
@@ -3281,6 +3307,42 @@ document.addEventListener("DOMContentLoaded", async function () {
           body: JSON.stringify({request_key: key, product: PRODUCT_CODE})
         });
         const data = await response.json();
+        // ?? ??? ?? ??? ????, ??? ?? ??? ??.
+        if (response.ok && data.ok && data.status === "resume_ready") {
+          if (!confirm("\u6c7a\u6e08\u753b\u9762\u3067\u30a8\u30e9\u30fc\u304c\u767a\u751f\u3057\u307e\u3057\u305f\u3002\n\u6700\u521d\u304b\u3089\u3084\u308a\u76f4\u3057\u307e\u3059\u304b\uff1f")) return;
+          if (localStorage.getItem(keyName) !== key) {
+            status.textContent = "\u6ce8\u6587\u60c5\u5831\u304c\u5909\u308f\u308a\u307e\u3057\u305f\u3002";
+            return;
+          }
+          const resumeUrl = new URL(data.approval_url);
+          const expectedHost = data.environment === "sandbox" ? "www.sandbox.paypal.com" :
+            data.environment === "live" ? "www.paypal.com" : "";
+          if (!expectedHost || resumeUrl.protocol !== "https:" ||
+              resumeUrl.hostname !== expectedHost || resumeUrl.port ||
+              resumeUrl.username || resumeUrl.password) {
+            throw new Error("unexpected approval host");
+          }
+          if (data.environment === "live") {
+            if (location.protocol !== "https:" ||
+                !["destiny-code.xyz", "www.destiny-code.xyz"].includes(location.hostname))
+              throw new Error("invalid return origin");
+            const tokens = resumeUrl.searchParams.getAll("token");
+            if (tokens.length !== 1 ||
+                !/^[A-Za-z0-9_-]{1,100}$/.test(tokens[0]) ||
+                !/^[A-Za-z0-9_-]{1,80}$/.test(key))
+              throw new Error("invalid return data");
+            const cookieName = "dc_resume_" + tokens[0];
+            document.cookie = cookieName + "=" + encodeURIComponent(key) +
+              "; Domain=destiny-code.xyz; Path=/reading.html; Max-Age=7200; Secure; SameSite=Lax";
+            const matches = document.cookie.split(";").map(x => x.trim())
+              .filter(x => x.startsWith(cookieName + "="));
+            if (matches.length !== 1 ||
+                matches[0] !== cookieName + "=" + encodeURIComponent(key))
+              throw new Error("return data unavailable");
+          }
+          location.assign(resumeUrl.href);
+          return;
+        }
         if (response.ok && data.ok && data.status === "failed_before_paypal") {
           status.textContent = "";
           if (confirm("\u6c7a\u6e08\u753b\u9762\u3092\u958b\u304f\u524d\u306b\u30a8\u30e9\u30fc\u304c\u767a\u751f\u3057\u307e\u3057\u305f\u3002\n\u3082\u3046\u4e00\u5ea6\u9032\u307f\u307e\u3059\u304b\uff1f")) {
@@ -3386,8 +3448,10 @@ document.addEventListener("DOMContentLoaded", async function () {
         throw new Error("checkout not confirmed");
       }
       const url = new URL(data.approval_url);
-      if (url.protocol !== "https:" ||
-          url.hostname !== "www.sandbox.paypal.com") {
+      const expectedHost = data.environment === "sandbox" ? "www.sandbox.paypal.com" :
+        data.environment === "live" ? "www.paypal.com" : "";
+      if (!expectedHost || url.protocol !== "https:" ||
+          url.hostname !== expectedHost || url.port || url.username || url.password) {
         throw new Error("unexpected approval host");
       }
       location.assign(url.href);
