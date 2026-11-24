@@ -3237,7 +3237,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     destinyPaymentMessage(
       "\u6c7a\u6e08\u306f\u30ad\u30e3\u30f3\u30bb\u30eb\u3055\u308c\u307e\u3057\u305f\u3002\u6ce8\u6587\u72b6\u6cc1\u3092\u78ba\u8a8d\u3057\u3066\u304f\u3060\u3055\u3044\u3002"
     );
-    return;
   }
 
   if (typeof PRODUCT_CODE === "undefined" ||
@@ -3285,9 +3284,21 @@ document.addEventListener("DOMContentLoaded", async function () {
 
 
   let purchaseClickInFlight = false;
+  let retryExistingOnce = false;
   button.addEventListener("click", async function () {
     if (button.disabled || purchaseClickInFlight) return;
     purchaseClickInFlight = true;
+    const isRetry = retryExistingOnce;
+    retryExistingOnce = false;
+    const uncertain = function () {
+      button.disabled = false;
+      status.textContent = "\u6ce8\u6587\u72b6\u6cc1\u3092\u78ba\u8a8d\u3067\u304d\u307e\u305b\u3093\u3002\u518d\u8cfc\u5165\u305b\u305a\u30b5\u30dd\u30fc\u30c8\u3078\u304a\u554f\u3044\u5408\u308f\u305b\u304f\u3060\u3055\u3044\u3002";
+      if (isRetry) return;
+      if (confirm("\u6c7a\u6e08\u753b\u9762\u3067\u30a8\u30e9\u30fc\u304c\u767a\u751f\u3057\u307e\u3057\u305f\u3002\n\u6700\u521d\u304b\u3089\u3084\u308a\u76f4\u3057\u307e\u3059\u304b\uff1f")) {
+        retryExistingOnce = true;
+        setTimeout(() => button.click(), 0);
+      }
+    };
     try {
     if (!window.destinyBirthInput) {
       status.textContent = "\u5148\u306b\u7121\u6599\u9451\u5b9a\u3092\u5b9f\u884c\u3057\u3066\u304f\u3060\u3055\u3044\u3002";
@@ -3309,7 +3320,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         const data = await response.json();
         // ?? ??? ?? ??? ????, ??? ?? ??? ??.
         if (response.ok && data.ok && data.status === "resume_ready") {
-          if (!confirm("\u6c7a\u6e08\u753b\u9762\u3067\u30a8\u30e9\u30fc\u304c\u767a\u751f\u3057\u307e\u3057\u305f\u3002\n\u6700\u521d\u304b\u3089\u3084\u308a\u76f4\u3057\u307e\u3059\u304b\uff1f")) return;
+          if (!isRetry) if (!confirm("\u6c7a\u6e08\u753b\u9762\u3067\u30a8\u30e9\u30fc\u304c\u767a\u751f\u3057\u307e\u3057\u305f\u3002\n\u6700\u521d\u304b\u3089\u3084\u308a\u76f4\u3057\u307e\u3059\u304b\uff1f")) return;
           if (localStorage.getItem(keyName) !== key) {
             status.textContent = "\u6ce8\u6587\u60c5\u5831\u304c\u5909\u308f\u308a\u307e\u3057\u305f\u3002";
             return;
@@ -3368,8 +3379,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             setTimeout(() => button.click(), 0);
             return;
           }
-          alert("\u6ce8\u6587\u72b6\u6cc1\u3092\u78ba\u8a8d\u3067\u304d\u307e\u305b\u3093\u3002");
-          status.textContent = "\u6ce8\u6587\u72b6\u6cc1\u3092\u78ba\u8a8d\u3067\u304d\u307e\u305b\u3093\u3002";
+          uncertain();
           return;
         }
         if (localStorage.getItem(keyName) !== key) {
@@ -3390,7 +3400,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         localStorage.removeItem(keyName);
       }
     } catch (_) {
-      status.textContent = "Storage unavailable. Test stopped.";
+      uncertain();
       return;
     }
 
@@ -3456,7 +3466,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       }
       location.assign(url.href);
     } catch (_) {
-      status.textContent = "Result uncertain. Do not create another order; request review.";
+      uncertain();
     }
     } finally {
       purchaseClickInFlight = false;
