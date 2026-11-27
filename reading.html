@@ -1421,7 +1421,14 @@ const CONFIG = {
 
   year:{
     kicker:"NEW YEAR FORTUNE",
-    title:"新年運勢",
+    title:(function () {
+      const parts = new Intl.DateTimeFormat("en-CA", {
+        timeZone: "Asia/Tokyo", year: "numeric", month: "numeric"
+      }).formatToParts(new Date());
+      const year = Number(parts.find(p => p.type === "year").value);
+      const month = Number(parts.find(p => p.type === "month").value);
+      return (year + (month >= 7 ? 1 : 0)) + "\u5e74\u65b0\u5e74\u904b\u52e2";
+    })(),
     intro:"あなたの命式と年運を重ね、今年の流れを読み解きます。",
     button:"無料で新年運勢を読み解く",
     analysis:"今年の年運を確認しています",
@@ -3266,6 +3273,8 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   // 상태 메시지는 기존 버튼 근처에 표시합니다.
   status.style.cssText = "margin:12px 0;color:#d8c490;text-align:center";
+
+
   existingButton.insertAdjacentElement("afterend", status);
 
   // 현재 로컬 시험에서는 기존의 '준비 중' 안내를 숨깁니다.
@@ -3405,7 +3414,98 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     // EMAIL_FORMAT_CONFIRM_V1: format only, not deliverability.
-    const enteredEmail = prompt("\u9451\u5b9a\u7d50\u679c\u3092\u304a\u5c4a\u3051\u3059\u308b\u30e1\u30fc\u30eb\u30a2\u30c9\u30ec\u30b9\u3092\u5165\u529b\u3057\u3066\u304f\u3060\u3055\u3044");
+    // CUSTOMER_EMAIL_DIALOG_V1
+    const enteredEmail = await new Promise(function (resolve) {
+      const backdrop = document.createElement("div");
+      backdrop.style.cssText =
+        "position:fixed;inset:0;background:rgba(0,0,0,.75);" +
+        "display:flex;align-items:center;justify-content:center;" +
+        "padding:20px;z-index:2147483647;";
+
+      const dialog = document.createElement("div");
+      dialog.setAttribute("role", "dialog");
+      dialog.setAttribute("aria-modal", "true");
+      dialog.setAttribute("aria-labelledby", "customerEmailDialogTitle");
+      dialog.style.cssText =
+        "box-sizing:border-box;width:100%;max-width:440px;" +
+        "background:#101a30;border:1px solid #c9a85b;" +
+        "border-radius:8px;padding:24px;color:#fff;" +
+        "box-shadow:0 12px 40px rgba(0,0,0,.5);";
+
+      const title = document.createElement("h2");
+      title.id = "customerEmailDialogTitle";
+      title.style.cssText = "margin:0 0 16px;font-size:20px;color:#e5cf96";
+      title.textContent = "\u9451\u5b9a\u7d50\u679c\u306e\u304a\u5c4a\u3051\u5148";
+
+      const label = document.createElement("label");
+      label.htmlFor = "customerEmailDialogInput";
+      label.style.cssText = "display:block;margin-bottom:8px;font-weight:bold";
+      label.textContent = "\u30e1\u30fc\u30eb\u30a2\u30c9\u30ec\u30b9\uff08\u5fc5\u9808\uff09";
+
+      const input = document.createElement("input");
+      input.id = "customerEmailDialogInput";
+      input.type = "email";
+      input.autocomplete = "email";
+      input.inputMode = "email";
+      input.maxLength = 254;
+      input.placeholder = "example@example.com";
+      input.style.cssText =
+        "box-sizing:border-box;width:100%;padding:14px;" +
+        "background:#fff;color:#111;border:2px solid #c9a85b;" +
+        "border-radius:4px;font-size:16px;";
+
+      const help = document.createElement("p");
+      help.style.cssText = "font-size:13px;line-height:1.6;color:#d7deea";
+      help.textContent =
+        "\u9451\u5b9a\u66f8\u3092\u3053\u3061\u3089\u306b\u304a\u5c4a\u3051\u3057\u307e\u3059\u3002";
+
+      const actions = document.createElement("div");
+      actions.style.cssText =
+        "display:flex;gap:10px;justify-content:flex-end;margin-top:18px;";
+
+      const cancel = document.createElement("button");
+      cancel.type = "button";
+      cancel.textContent = "\u30ad\u30e3\u30f3\u30bb\u30eb";
+      cancel.style.cssText =
+        "padding:10px 16px;border:1px solid #aaa;border-radius:4px;" +
+        "background:#263249;color:#fff;cursor:pointer;";
+
+      const next = document.createElement("button");
+      next.type = "button";
+      next.textContent = "\u78ba\u8a8d\u3078\u9032\u3080";
+      next.style.cssText =
+        "padding:10px 16px;border:0;border-radius:4px;" +
+        "background:#dfc07b;color:#111;font-weight:bold;cursor:pointer;";
+
+      let finished = false;
+      const previousFocus = document.activeElement;
+      function finish(value) {
+        if (finished) return;
+        finished = true;
+        document.removeEventListener("keydown", onKey);
+        backdrop.remove();
+        if (previousFocus && previousFocus.focus) previousFocus.focus();
+        resolve(value);
+      }
+      function onKey(event) {
+        if (event.key === "Escape") {
+          event.preventDefault();
+          finish(null);
+        } else if (event.key === "Enter" && document.activeElement === input) {
+          event.preventDefault();
+          finish(input.value);
+        }
+      }
+
+      cancel.addEventListener("click", () => finish(null));
+      next.addEventListener("click", () => finish(input.value));
+      document.addEventListener("keydown", onKey);
+      actions.append(cancel, next);
+      dialog.append(title, label, input, help, actions);
+      backdrop.appendChild(dialog);
+      document.body.appendChild(backdrop);
+      input.focus();
+    });
     if (enteredEmail === null) return;
     const email = enteredEmail.trim();
     if (email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
